@@ -9,9 +9,10 @@ import UIKit
 
 final class MainViewController: UIViewController {
     
-    private var mainView = MainView()
+    private let mainView = MainView()
     private let viewModel = MainViewModel()
-    
+
+    // MARK: - LifeCycle
     override func loadView() {
         view = mainView
     }
@@ -19,18 +20,11 @@ final class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        configureEssential()
         bindData()
+        configureEssential()
     }
     
-    private func configureEssential() {
-        mainView.shoppingSearchBar.delegate = self
-        
-        navigationItem.title = "도봉러의 쇼핑쇼핑"
-        navigationController?.navigationBar.barStyle = .default
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
-    }
-    
+    // MARK: - Functions
     private func bindData() {
         viewModel.outputSearchButtonTapped.lazyBind { data in
             let vc = ShoppingViewController()
@@ -50,6 +44,7 @@ final class MainViewController: UIViewController {
     }
 }
 
+// MARK: - Extension
 extension MainViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         print(#function)
@@ -57,5 +52,16 @@ extension MainViewController: UISearchBarDelegate {
         viewModel.inputSearchButtonTapped.value = searchBar.text
 
         view.endEditing(true)
+    }
+}
+
+// MARK: - ConfigureView
+extension MainViewController {
+    private func configureEssential() {
+        navigationItem.title = "도봉러의 쇼핑쇼핑"
+        navigationController?.navigationBar.barStyle = .default
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+        
+        mainView.shoppingSearchBar.delegate = self
     }
 }

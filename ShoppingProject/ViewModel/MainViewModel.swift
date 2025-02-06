@@ -14,12 +14,14 @@ class MainViewModel {
     let outputSearchButtonTapped: Observable<String?> = Observable(nil)
     let outputValidateAlert: Observable<Bool> = Observable(false)
     
+    // MARK: - Initializer
     init() {
         inputSearchButtonTapped.lazyBind { _ in
             self.validateSearchText()
         }
     }
     
+    // MARK: - Functions
     private func validateSearchText() {
         guard let searchText = self.inputSearchButtonTapped.value else {
             self.outputValidateAlert.value = false

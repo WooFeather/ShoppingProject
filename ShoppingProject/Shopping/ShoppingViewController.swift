@@ -6,33 +6,27 @@
 //
 
 import UIKit
-import SnapKit
 
 final class ShoppingViewController: UIViewController {
-
-    lazy private var shoppingCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
-    private let resultCountLabel = UILabel()
-    private let sampleButton = UIButton()
-//    private var navTitleContents: String?
     
-    private let accuracyButton = SortButton(title: "정확도")
-    private let dateButton = SortButton(title: "날짜순")
-    private let highPriceButton = SortButton(title: "가격높은순")
-    private let lowPriceButton = SortButton(title: "가격낮은순")
-    
+    private let shoppingView = ShoppingView()
     let viewModel = ShoppingViewModel()
+    
+    // MARK: - LifeCycle
+    override func loadView() {
+        view = shoppingView
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        configureView()
-        configureResultCountLabel()
-        configureButtons()
-        configureCollectionView()
-        configureAction()
         bindData()
+        configureAction()
+        configureView()
+        configureData()
     }
     
+    // MARK: - Functions
     private func bindData() {
         viewModel.inputViewDidLoadTrigger.value = ()
         
@@ -41,16 +35,17 @@ final class ShoppingViewController: UIViewController {
         }
         
         viewModel.outputSearchItem.lazyBind { _ in
-            self.shoppingCollectionView.reloadData()
+            self.shoppingView.shoppingCollectionView.reloadData()
         }
         
         viewModel.outputCountText.lazyBind { count in
-            self.resultCountLabel.text = count
+            self.shoppingView.resultCountLabel.text = count
         }
         
         viewModel.outputItemIsEmpty.lazyBind { state in
+            // 검색결과가 0개일 경우 scrollToItem을 하면 앱이 터질 수 있어서 조건처리
             if !state {
-                self.shoppingCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
+                self.shoppingView.shoppingCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
             } else {
                 return
             }
@@ -61,13 +56,21 @@ final class ShoppingViewController: UIViewController {
         }
     }
     
+    private func configureAction() {
+        shoppingView.accuracyButton.addTarget(self, action: #selector(accuracyButtonTapped), for: .touchUpInside)
+        shoppingView.dateButton.addTarget(self, action: #selector(dateButtonTapped), for: .touchUpInside)
+        shoppingView.highPriceButton.addTarget(self, action: #selector(highPriceButtonTapped), for: .touchUpInside)
+        shoppingView.lowPriceButton.addTarget(self, action: #selector(lowPriceButtonTapped), for: .touchUpInside)
+    }
+    
+    // MARK: - Actions
     @objc
     private func accuracyButtonTapped() {
         print(#function)
-        accuracyButton.isSelected = true
-        dateButton.isSelected = false
-        highPriceButton.isSelected = false
-        lowPriceButton.isSelected = false
+        shoppingView.accuracyButton.isSelected = true
+        shoppingView.dateButton.isSelected = false
+        shoppingView.highPriceButton.isSelected = false
+        shoppingView.lowPriceButton.isSelected = false
         
         viewModel.inputAccuracyButtonTapped.value = ()
     }
@@ -75,10 +78,10 @@ final class ShoppingViewController: UIViewController {
     @objc
     private func dateButtonTapped() {
         print(#function)
-        accuracyButton.isSelected = false
-        dateButton.isSelected = true
-        highPriceButton.isSelected = false
-        lowPriceButton.isSelected = false
+        shoppingView.accuracyButton.isSelected = false
+        shoppingView.dateButton.isSelected = true
+        shoppingView.highPriceButton.isSelected = false
+        shoppingView.lowPriceButton.isSelected = false
         
         viewModel.inputDateButtonTapped.value = ()
     }
@@ -86,10 +89,10 @@ final class ShoppingViewController: UIViewController {
     @objc
     private func highPriceButtonTapped() {
         print(#function)
-        accuracyButton.isSelected = false
-        dateButton.isSelected = false
-        highPriceButton.isSelected = true
-        lowPriceButton.isSelected = false
+        shoppingView.accuracyButton.isSelected = false
+        shoppingView.dateButton.isSelected = false
+        shoppingView.highPriceButton.isSelected = true
+        shoppingView.lowPriceButton.isSelected = false
         
         viewModel.inputHighPriceButtonTapped.value = ()
     }
@@ -97,10 +100,10 @@ final class ShoppingViewController: UIViewController {
     @objc
     private func lowPriceButtonTapped() {
         print(#function)
-        accuracyButton.isSelected = false
-        dateButton.isSelected = false
-        highPriceButton.isSelected = false
-        lowPriceButton.isSelected = true
+        shoppingView.accuracyButton.isSelected = false
+        shoppingView.dateButton.isSelected = false
+        shoppingView.highPriceButton.isSelected = false
+        shoppingView.lowPriceButton.isSelected = true
         
         viewModel.inputLowPriceButtonTapped.value = ()
     }
@@ -109,15 +112,10 @@ final class ShoppingViewController: UIViewController {
     private func backButtonTapped() {
         viewModel.inputBackButtonTapped.value = ()
     }
-    
-    private func configureAction() {
-        accuracyButton.addTarget(self, action: #selector(accuracyButtonTapped), for: .touchUpInside)
-        dateButton.addTarget(self, action: #selector(dateButtonTapped), for: .touchUpInside)
-        highPriceButton.addTarget(self, action: #selector(highPriceButtonTapped), for: .touchUpInside)
-        lowPriceButton.addTarget(self, action: #selector(lowPriceButtonTapped), for: .touchUpInside)
-    }
 }
 
+// MARK: - Extension
+// 페이지네이션 기능 주석처리
 //extension ShoppingViewController: UICollectionViewDataSourcePrefetching {
 //    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
 //        print("🔗indexPath야 \(indexPaths)")
@@ -142,7 +140,7 @@ extension ShoppingViewController: UICollectionViewDelegate, UICollectionViewData
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = shoppingCollectionView.dequeueReusableCell(withReuseIdentifier: ShoppingCollectionViewCell.id, for: indexPath) as? ShoppingCollectionViewCell else { return UICollectionViewCell() }
+        guard let cell = shoppingView.shoppingCollectionView.dequeueReusableCell(withReuseIdentifier: ShoppingCollectionViewCell.id, for: indexPath) as? ShoppingCollectionViewCell else { return UICollectionViewCell() }
         
         let data = viewModel.outputSearchItem.value[indexPath.row]
         cell.configureData(data: data)
@@ -151,6 +149,7 @@ extension ShoppingViewController: UICollectionViewDelegate, UICollectionViewData
     }
 }
 
+// MARK: - ConfigureView
 extension ShoppingViewController {
     private func configureView() {
         view.backgroundColor = .black
@@ -163,70 +162,11 @@ extension ShoppingViewController {
         navigationController?.navigationBar.tintColor = .white
     }
     
-    private func configureResultCountLabel() {
-        view.addSubview(resultCountLabel)
-        
-        resultCountLabel.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(8)
-            make.horizontalEdges.equalTo(view).inset(12)
-            make.height.equalTo(17)
-        }
-
-        resultCountLabel.font = .boldSystemFont(ofSize: 15)
-        resultCountLabel.textColor = .green
-    }
-    
-    private func configureButtons() {
-        let buttons = [accuracyButton, dateButton, highPriceButton, lowPriceButton]
-        buttons.forEach { view.addSubview($0) }
-        
-        for i in 0..<buttons.count {
-            if i == 0 {
-                buttons[i].snp.makeConstraints { make in
-                    make.top.equalTo(resultCountLabel.snp.bottom).offset(10)
-                    make.leading.equalTo(view).offset(12)
-                    make.height.equalTo(36)
-                }
-            } else {
-                buttons[i].snp.makeConstraints { make in
-                    make.top.equalTo(resultCountLabel.snp.bottom).offset(10)
-                    make.leading.equalTo(buttons[i - 1].snp.trailing).offset(8)
-                    make.height.equalTo(36)
-                }
-            }
-        }
-        
-        accuracyButton.isSelected = true
-    }
-    
-    private func createCollectionViewLayout() -> UICollectionViewLayout {
-        let sectionInset: CGFloat = 10
-        let cellSpacing: CGFloat = 10
-        
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        
-        let deviceWidth = UIScreen.main.bounds.width
-        let cellWidth = deviceWidth - (sectionInset * 2) - (cellSpacing)
-        
-        layout.itemSize = CGSize(width: cellWidth / 2, height: (cellWidth / 2) * 1.5)
-        layout.sectionInset = UIEdgeInsets(top: sectionInset, left: sectionInset, bottom: sectionInset, right: sectionInset)
-        return layout
-    }
-    
-    private func configureCollectionView() {
-        view.addSubview(shoppingCollectionView)
-        
-        shoppingCollectionView.delegate = self
-        shoppingCollectionView.dataSource = self
-//        shoppingCollectionView.prefetchDataSource = self
-        shoppingCollectionView.register(ShoppingCollectionViewCell.self, forCellWithReuseIdentifier: ShoppingCollectionViewCell.id)
-        
-        shoppingCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(accuracyButton.snp.bottom).offset(8)
-            make.bottom.horizontalEdges.equalToSuperview()
-        }
-        
-        shoppingCollectionView.backgroundColor = .black
+    private func configureData() {
+        shoppingView.accuracyButton.isSelected = true
+        shoppingView.shoppingCollectionView.delegate = self
+        shoppingView.shoppingCollectionView.dataSource = self
+        // shoppingView.shoppingCollectionView.prefetchDataSource = self
+        shoppingView.shoppingCollectionView.register(ShoppingCollectionViewCell.self, forCellWithReuseIdentifier: ShoppingCollectionViewCell.id)
     }
 }

@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 class Observable<T> {
     
     private var closure: ((T) -> Void)?

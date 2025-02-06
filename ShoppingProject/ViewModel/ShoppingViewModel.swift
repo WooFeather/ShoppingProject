@@ -24,6 +24,7 @@ final class ShoppingViewModel {
     
     private lazy var query = outputSearchText.value
     
+    // MARK: - Initializer
     init() {
         inputViewDidLoadTrigger.lazyBind { _ in
             print("🩷viewDidLoad bind", self.query ?? "")
@@ -51,6 +52,7 @@ final class ShoppingViewModel {
         }
     }
     
+    // MARK: - Functions
     private func callRequest(query: String, sort: RequestSort = .sim) {
         let url = "https://openapi.naver.com/v1/search/shop.json?query=\(query)&display=100&start=1&sort=\(sort)"
         let header: HTTPHeaders = [
