@@ -10,10 +10,15 @@ import Alamofire
 
 final class ShoppingViewModel {
     let inputViewDidLoadTrigger: Observable<Void?> = Observable(nil)
+    let inputAccuracyButtonTapped: Observable<Void?> = Observable(nil)
+    let inputDateButtonTapped: Observable<Void?> = Observable(nil)
+    let inputHighPriceButtonTapped: Observable<Void?> = Observable(nil)
+    let inputLowPriceButtonTapped: Observable<Void?> = Observable(nil)
     
     var outputSearchText: Observable<String?> = Observable(nil)
     let outputSearchItem: Observable<[Item]> = Observable([])
     let outputCountText: Observable<String?> = Observable(nil)
+    let outputItemIsEmpty: Observable<Bool> = Observable(false)
     
     private lazy var query = outputSearchText.value
     
@@ -21,6 +26,22 @@ final class ShoppingViewModel {
         inputViewDidLoadTrigger.lazyBind { _ in
             print("🩷viewDidLoad bind", self.query ?? "")
             self.callRequest(query: self.query ?? "")
+        }
+        
+        inputAccuracyButtonTapped.lazyBind { _ in
+            self.callRequest(query: self.query ?? "", sort: .sim)
+        }
+        
+        inputDateButtonTapped.lazyBind { _ in
+            self.callRequest(query: self.query ?? "", sort: .date)
+        }
+        
+        inputHighPriceButtonTapped.lazyBind { _ in
+            self.callRequest(query: self.query ?? "", sort: .dsc)
+        }
+        
+        inputLowPriceButtonTapped.lazyBind { _ in
+            self.callRequest(query: self.query ?? "", sort: .asc)
         }
     }
     
@@ -41,10 +62,11 @@ final class ShoppingViewModel {
                 self.outputSearchItem.value = value.items
                 self.outputCountText.value = "\(value.totalCount.formatted()) 개의 검색 결과"
                 
-                // TODO: 정렬버튼 눌렀을 때 상단으로 이동
-//                if outputSearchItem.value.count != 0 {
-//                    self.shoppingCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
-//                }
+                if self.outputSearchItem.value.count != 0 {
+                    self.outputItemIsEmpty.value = false
+                } else {
+                    self.outputItemIsEmpty.value = true
+                }
             case .failure(let error):
                 print("❌ FAILURE \(error)")
             }

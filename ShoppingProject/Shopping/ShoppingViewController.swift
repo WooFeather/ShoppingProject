@@ -47,19 +47,25 @@ final class ShoppingViewController: UIViewController {
         viewModel.outputCountText.lazyBind { count in
             self.resultCountLabel.text = count
         }
+        
+        viewModel.outputItemIsEmpty.lazyBind { state in
+            if !state {
+                self.shoppingCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
+            } else {
+                return
+            }
+        }
     }
     
     @objc
     private func accuracyButtonTapped() {
         print(#function)
-        // 이부분도 단순화 할수있을거같은데
         accuracyButton.isSelected = true
         dateButton.isSelected = false
         highPriceButton.isSelected = false
         lowPriceButton.isSelected = false
         
-        // TODO: 정렬버튼 네트워크 통신
-//        callRequest(query: viewModel.outputSearchText.value ?? "", sort: .sim)
+        viewModel.inputAccuracyButtonTapped.value = ()
     }
     
     @objc
@@ -70,7 +76,7 @@ final class ShoppingViewController: UIViewController {
         highPriceButton.isSelected = false
         lowPriceButton.isSelected = false
         
-//        callRequest(query: viewModel.outputSearchText.value ?? "", sort: .date)
+        viewModel.inputDateButtonTapped.value = ()
     }
     
     @objc
@@ -81,7 +87,7 @@ final class ShoppingViewController: UIViewController {
         highPriceButton.isSelected = true
         lowPriceButton.isSelected = false
         
-//        callRequest(query: viewModel.outputSearchText.value ?? "", sort: .dsc)
+        viewModel.inputHighPriceButtonTapped.value = ()
     }
     
     @objc
@@ -92,9 +98,10 @@ final class ShoppingViewController: UIViewController {
         highPriceButton.isSelected = false
         lowPriceButton.isSelected = true
         
-//        callRequest(query: viewModel.outputSearchText.value ?? "", sort: .asc)
+        viewModel.inputLowPriceButtonTapped.value = ()
     }
     
+    // TODO: 뒤로가기 버튼 탭했을때 MVVM을 통해 pop
     @objc
     private func backButtonTapped() {
         navigationController?.popViewController(animated: true)
@@ -144,7 +151,6 @@ extension ShoppingViewController: UICollectionViewDelegate, UICollectionViewData
 extension ShoppingViewController {
     func configureView() {
         view.backgroundColor = .black
-//        navigationItem.title = navTitleContents
         navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
         
