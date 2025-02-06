@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Alamofire
 import SnapKit
 
 final class ShoppingViewController: UIViewController {
@@ -21,16 +20,12 @@ final class ShoppingViewController: UIViewController {
     private let highPriceButton = SortButton(title: "가격높은순")
     private let lowPriceButton = SortButton(title: "가격낮은순")
     
-    private var list: [Item] = []
-    
     let viewModel = ShoppingViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         configureView()
-        // TODO: navTitleContents 대신 VM의 outputSearchText 사용
-        callRequest(query: viewModel.outputSearchText.value ?? "")
         configureResultCountLabel()
         configureButtons()
         configureCollectionView()
@@ -39,8 +34,18 @@ final class ShoppingViewController: UIViewController {
     }
     
     private func bindData() {
+        viewModel.inputViewDidLoadTrigger.value = ()
+        
         viewModel.outputSearchText.bind { text in
             self.navigationItem.title = text
+        }
+        
+        viewModel.outputSearchItem.lazyBind { _ in
+            self.shoppingCollectionView.reloadData()
+        }
+        
+        viewModel.outputCountText.lazyBind { count in
+            self.resultCountLabel.text = count
         }
     }
     
@@ -53,7 +58,8 @@ final class ShoppingViewController: UIViewController {
         highPriceButton.isSelected = false
         lowPriceButton.isSelected = false
         
-        callRequest(query: viewModel.outputSearchText.value ?? "", sort: .sim)
+        // TODO: 정렬버튼 네트워크 통신
+//        callRequest(query: viewModel.outputSearchText.value ?? "", sort: .sim)
     }
     
     @objc
@@ -64,7 +70,7 @@ final class ShoppingViewController: UIViewController {
         highPriceButton.isSelected = false
         lowPriceButton.isSelected = false
         
-        callRequest(query: viewModel.outputSearchText.value ?? "", sort: .date)
+//        callRequest(query: viewModel.outputSearchText.value ?? "", sort: .date)
     }
     
     @objc
@@ -75,7 +81,7 @@ final class ShoppingViewController: UIViewController {
         highPriceButton.isSelected = true
         lowPriceButton.isSelected = false
         
-        callRequest(query: viewModel.outputSearchText.value ?? "", sort: .dsc)
+//        callRequest(query: viewModel.outputSearchText.value ?? "", sort: .dsc)
     }
     
     @objc
@@ -86,7 +92,7 @@ final class ShoppingViewController: UIViewController {
         highPriceButton.isSelected = false
         lowPriceButton.isSelected = true
         
-        callRequest(query: viewModel.outputSearchText.value ?? "", sort: .asc)
+//        callRequest(query: viewModel.outputSearchText.value ?? "", sort: .asc)
     }
     
     @objc
@@ -99,36 +105,6 @@ final class ShoppingViewController: UIViewController {
         dateButton.addTarget(self, action: #selector(dateButtonTapped), for: .touchUpInside)
         highPriceButton.addTarget(self, action: #selector(highPriceButtonTapped), for: .touchUpInside)
         lowPriceButton.addTarget(self, action: #selector(lowPriceButtonTapped), for: .touchUpInside)
-    }
-    
-    private func callRequest(query: String, sort: RequestSort = .sim) {
-        let url = "https://openapi.naver.com/v1/search/shop.json?query=\(query)&display=100&start=1&sort=\(sort)"
-        let header: HTTPHeaders = [
-            "X-Naver-Client-Id": APIKey.naverId,
-            "X-Naver-Client-Secret": APIKey.naverSecret
-        ]
-        
-        print("💙 URL이야 \(url)")
-        
-        AF.request(url, method: .get, headers: header).responseDecodable(of: SearchItem.self) { response in
-            switch response.result {
-            case .success(let value):
-                print("✅ SUCCESS")
-
-                self.resultCountLabel.text = "\(NumberFormattingManager.shared.numberFormatting(number: value.totalCount) ?? "") 개의 검색 결과"
-
-                self.list = value.items
-                
-                self.shoppingCollectionView.reloadData()
-                
-                // self.list.count != 0 이 조건을 추가해줌으로써 검색결과가 없을때 앱이 터지는걸 방지
-                if self.list.count != 0 {
-                    self.shoppingCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
-                }
-            case .failure(let error):
-                print("❌ FAILURE \(error)")
-            }
-        }
     }
 }
 
@@ -152,13 +128,13 @@ final class ShoppingViewController: UIViewController {
 
 extension ShoppingViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return list.count
+        return viewModel.outputSearchItem.value.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = shoppingCollectionView.dequeueReusableCell(withReuseIdentifier: ShoppingCollectionViewCell.id, for: indexPath) as? ShoppingCollectionViewCell else { return UICollectionViewCell() }
         
-        let data = list[indexPath.row]
+        let data = viewModel.outputSearchItem.value[indexPath.row]
         cell.configureData(data: data)
         
         return cell
