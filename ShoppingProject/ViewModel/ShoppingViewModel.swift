@@ -14,11 +14,13 @@ final class ShoppingViewModel {
     let inputDateButtonTapped: Observable<Void?> = Observable(nil)
     let inputHighPriceButtonTapped: Observable<Void?> = Observable(nil)
     let inputLowPriceButtonTapped: Observable<Void?> = Observable(nil)
+    let inputBackButtonTapped: Observable<Void?> = Observable(nil)
     
     var outputSearchText: Observable<String?> = Observable(nil)
     let outputSearchItem: Observable<[Item]> = Observable([])
     let outputCountText: Observable<String?> = Observable(nil)
     let outputItemIsEmpty: Observable<Bool> = Observable(false)
+    let outputBackButtonTapped: Observable<Void?> = Observable(nil)
     
     private lazy var query = outputSearchText.value
     
@@ -42,6 +44,10 @@ final class ShoppingViewModel {
         
         inputLowPriceButtonTapped.lazyBind { _ in
             self.callRequest(query: self.query ?? "", sort: .asc)
+        }
+        
+        inputBackButtonTapped.lazyBind { _ in
+            self.outputBackButtonTapped.value = self.inputBackButtonTapped.value
         }
     }
     

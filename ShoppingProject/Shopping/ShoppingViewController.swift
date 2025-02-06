@@ -55,6 +55,10 @@ final class ShoppingViewController: UIViewController {
                 return
             }
         }
+        
+        viewModel.outputBackButtonTapped.lazyBind { _ in
+            self.navigationController?.popViewController(animated: true)
+        }
     }
     
     @objc
@@ -101,10 +105,9 @@ final class ShoppingViewController: UIViewController {
         viewModel.inputLowPriceButtonTapped.value = ()
     }
     
-    // TODO: 뒤로가기 버튼 탭했을때 MVVM을 통해 pop
     @objc
     private func backButtonTapped() {
-        navigationController?.popViewController(animated: true)
+        viewModel.inputBackButtonTapped.value = ()
     }
     
     private func configureAction() {
@@ -149,7 +152,7 @@ extension ShoppingViewController: UICollectionViewDelegate, UICollectionViewData
 }
 
 extension ShoppingViewController {
-    func configureView() {
+    private func configureView() {
         view.backgroundColor = .black
         navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
@@ -160,7 +163,7 @@ extension ShoppingViewController {
         navigationController?.navigationBar.tintColor = .white
     }
     
-    func configureResultCountLabel() {
+    private func configureResultCountLabel() {
         view.addSubview(resultCountLabel)
         
         resultCountLabel.snp.makeConstraints { make in
@@ -173,7 +176,7 @@ extension ShoppingViewController {
         resultCountLabel.textColor = .green
     }
     
-    func configureButtons() {
+    private func configureButtons() {
         let buttons = [accuracyButton, dateButton, highPriceButton, lowPriceButton]
         buttons.forEach { view.addSubview($0) }
         
@@ -196,7 +199,7 @@ extension ShoppingViewController {
         accuracyButton.isSelected = true
     }
     
-    func createCollectionViewLayout() -> UICollectionViewLayout {
+    private func createCollectionViewLayout() -> UICollectionViewLayout {
         let sectionInset: CGFloat = 10
         let cellSpacing: CGFloat = 10
         
