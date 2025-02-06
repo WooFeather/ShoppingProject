@@ -22,7 +22,7 @@ class MainViewModel {
     
     private func validateSearchText() {
         guard let searchText = self.inputSearchButtonTapped.value else {
-            print("텍스트가 nil")
+            self.outputValidateAlert.value = false
             return
         }
         

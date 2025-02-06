@@ -21,9 +21,6 @@ final class ShoppingViewController: UIViewController {
     private let highPriceButton = SortButton(title: "가격높은순")
     private let lowPriceButton = SortButton(title: "가격낮은순")
     
-    private var start = 1
-    private var maxNum = 0
-    
     private var list: [Item] = []
     
     let viewModel = ShoppingViewModel()
@@ -56,7 +53,6 @@ final class ShoppingViewController: UIViewController {
         highPriceButton.isSelected = false
         lowPriceButton.isSelected = false
         
-        start = 1
         callRequest(query: viewModel.outputSearchText.value ?? "", sort: .sim)
     }
     
@@ -68,7 +64,6 @@ final class ShoppingViewController: UIViewController {
         highPriceButton.isSelected = false
         lowPriceButton.isSelected = false
         
-        start = 1
         callRequest(query: viewModel.outputSearchText.value ?? "", sort: .date)
     }
     
@@ -80,7 +75,6 @@ final class ShoppingViewController: UIViewController {
         highPriceButton.isSelected = true
         lowPriceButton.isSelected = false
         
-        start = 1
         callRequest(query: viewModel.outputSearchText.value ?? "", sort: .dsc)
     }
     
@@ -92,7 +86,6 @@ final class ShoppingViewController: UIViewController {
         highPriceButton.isSelected = false
         lowPriceButton.isSelected = true
         
-        start = 1
         callRequest(query: viewModel.outputSearchText.value ?? "", sort: .asc)
     }
     
@@ -109,7 +102,7 @@ final class ShoppingViewController: UIViewController {
     }
     
     private func callRequest(query: String, sort: RequestSort = .sim) {
-        let url = "https://openapi.naver.com/v1/search/shop.json?query=\(query)&display=30&start=\(start)&sort=\(sort)"
+        let url = "https://openapi.naver.com/v1/search/shop.json?query=\(query)&display=100&start=1&sort=\(sort)"
         let header: HTTPHeaders = [
             "X-Naver-Client-Id": APIKey.naverId,
             "X-Naver-Client-Secret": APIKey.naverSecret
@@ -123,25 +116,13 @@ final class ShoppingViewController: UIViewController {
                 print("✅ SUCCESS")
 
                 self.resultCountLabel.text = "\(NumberFormattingManager.shared.numberFormatting(number: value.totalCount) ?? "") 개의 검색 결과"
-                
-                if value.totalCount > 100000 {
-                    self.maxNum = 100000
-                } else {
-                    self.maxNum = value.totalCount
-                }
-                
-                print("maxNum이야!! \(self.maxNum)")
-                
-                if self.start == 1 {
-                    self.list = value.items
-                } else {
-                    self.list.append(contentsOf: value.items)
-                }
+
+                self.list = value.items
                 
                 self.shoppingCollectionView.reloadData()
                 
                 // self.list.count != 0 이 조건을 추가해줌으로써 검색결과가 없을때 앱이 터지는걸 방지
-                if self.start == 1 && self.list.count != 0 {
+                if self.list.count != 0 {
                     self.shoppingCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
                 }
             case .failure(let error):
@@ -151,23 +132,23 @@ final class ShoppingViewController: UIViewController {
     }
 }
 
-extension ShoppingViewController: UICollectionViewDataSourcePrefetching {
-    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-        print("🔗indexPath야 \(indexPaths)")
-        
-        // max값을 구해서 분기처리 (10만보다 많으면 맥스값은 10만, 적으면 그 불러온 아이템수 값
-        for item in indexPaths {
-            if list.count - 3 == item.item {
-                if list.count < maxNum {
-                    start += 1
-                    callRequest(query: viewModel.outputSearchText.value ?? "")
-                } else {
-                    print("❗️마지막 페이지야!!")
-                }
-            }
-        }
-    }
-}
+//extension ShoppingViewController: UICollectionViewDataSourcePrefetching {
+//    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+//        print("🔗indexPath야 \(indexPaths)")
+//        
+//        // max값을 구해서 분기처리 (10만보다 많으면 맥스값은 10만, 적으면 그 불러온 아이템수 값
+//        for item in indexPaths {
+//            if list.count - 3 == item.item {
+//                if list.count < maxNum {
+//                    start += 1
+//                    callRequest(query: viewModel.outputSearchText.value ?? "")
+//                } else {
+//                    print("❗️마지막 페이지야!!")
+//                }
+//            }
+//        }
+//    }
+//}
 
 extension ShoppingViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -253,7 +234,7 @@ extension ShoppingViewController {
         
         shoppingCollectionView.delegate = self
         shoppingCollectionView.dataSource = self
-        shoppingCollectionView.prefetchDataSource = self
+//        shoppingCollectionView.prefetchDataSource = self
         shoppingCollectionView.register(ShoppingCollectionViewCell.self, forCellWithReuseIdentifier: ShoppingCollectionViewCell.id)
         
         shoppingCollectionView.snp.makeConstraints { make in
