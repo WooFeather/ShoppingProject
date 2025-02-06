@@ -7,9 +7,10 @@
 
 import UIKit
 
-class MainViewController: UIViewController {
+final class MainViewController: UIViewController {
     
-    var mainView = MainView()
+    private var mainView = MainView()
+    private let viewModel = MainViewModel()
     
     override func loadView() {
         view = mainView
@@ -19,40 +20,42 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         
         configureEssential()
+        bindData()
     }
     
-    func configureEssential() {
+    private func configureEssential() {
         mainView.shoppingSearchBar.delegate = self
         
         navigationItem.title = "도봉러의 쇼핑쇼핑"
         navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
     }
+    
+    private func bindData() {
+        viewModel.outputSearchButtonTapped.lazyBind { data in
+            let vc = ShoppingViewController()
+            vc.viewModel.outputSearchText.value = data
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+        
+        viewModel.outputValidateAlert.bind { state in
+            if state {
+                self.showAlert(title: "검색어를 다시 확인해주세요😭", message: "검색어는 2글자 이상이어야 합니다.", button: "확인") {
+                    self.dismiss(animated: true)
+                }
+            } else {
+                return
+            }
+        }
+    }
 }
 
 extension MainViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         print(#function)
-        guard let searchText = searchBar.text else {
-            // 텍스트가 없을 경우 return버튼이 비활성화되긴 함
-            print("텍스트가 nil이당")
-            return
-        }
         
-        let trimmingText = searchText.trimmingCharacters(in: .whitespaces)
-        
-        // 유효성검사(2글자 이상), 뷰전환(push), 값전달
-        if trimmingText.count < 2 {
-//            showAlert(title: "검색어를 다시 확인해주세요😭", message: "검색어는 2글자 이상이어야 합니다.")
-            showAlert(title: "검색어를 다시 확인해주세요😭", message: "검색어는 2글자 이상이어야 합니다.", button: "확인") {
-                self.dismiss(animated: true)
-            }
-        } else {
-            let vc = ShoppingViewController()
-            vc.navTitleContents = trimmingText
-            navigationController?.pushViewController(vc, animated: true)
-        }
-        
+        viewModel.inputSearchButtonTapped.value = searchBar.text
+
         view.endEditing(true)
     }
 }
