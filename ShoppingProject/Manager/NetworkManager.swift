@@ -37,7 +37,7 @@ final class NetworkManager {
                 .responseDecodable(of: SearchItem.self) { response in
                 switch response.result {
                 case .success(let data):
-                    print("✅ SUCCESS")
+                    print("✅ SUCCESS", url)
                     value(.success(data))
                 case .failure(let error):
                     print("❌ FAILURE \(error)")

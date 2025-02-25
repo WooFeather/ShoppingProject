@@ -36,8 +36,8 @@ final class MainViewController: UIViewController {
         )
         let output = viewModel.transfer(input: input)
         
-        Observable.combineLatest(output.isTextValidate, output.queryText)
-            .bind(with: self) { owner, value in
+        Driver.zip(output.isTextValidate, output.queryText)
+            .drive(with: self) { owner, value in
                 if value.0 {
                     print(value.1)
                     let vc = ShoppingViewController()

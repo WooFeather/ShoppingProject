@@ -21,12 +21,12 @@ final class MainViewModel {
     
     struct Output {
         // 유효성 검사 Bool
-        let isTextValidate: Observable<Bool>
-        let queryText: Observable<String>
+        let isTextValidate: Driver<Bool>
+        let queryText: Driver<String>
     }
     
     func transfer(input: Input) -> Output {
-        let queryText = BehaviorSubject(value: "")
+        let queryText = PublishRelay<String>()
         
         let isTextValidate =  input.searchButtonTapped
             .withLatestFrom(input.searchText)
@@ -35,14 +35,14 @@ final class MainViewModel {
                 if trimmingText.count < 2 {
                     return false
                 } else {
-                    queryText.onNext(trimmingText)
+                    queryText.accept(trimmingText)
                     return true
                 }
             }
         
         return Output(
-            isTextValidate: isTextValidate,
-            queryText: queryText
+            isTextValidate: isTextValidate.asDriver(onErrorJustReturn: false),
+            queryText: queryText.asDriver(onErrorJustReturn: "")
         )
     }
 }
