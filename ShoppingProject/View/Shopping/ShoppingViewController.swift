@@ -26,12 +26,11 @@ final class ShoppingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        bind()
-        
         //        bindData()
         //        configureAction()
         configureView()
         configureData()
+        bind()
     }
     
     // MARK: - Functions
@@ -82,6 +81,12 @@ final class ShoppingViewController: UIViewController {
                 owner.shoppingView.dateButton.isSelected = value.1
                 owner.shoppingView.highPriceButton.isSelected = value.2
                 owner.shoppingView.lowPriceButton.isSelected = value.3
+            }
+            .disposed(by: disposeBag)
+        
+        output.backButtonTapped!
+            .bind(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
     }
@@ -167,11 +172,11 @@ final class ShoppingViewController: UIViewController {
 //        bfViewModel.inputLowPriceButtonTapped.value = ()
 //    }
 //    
-    @objc
-    private func backButtonTapped() {
-        // bfViewModel.inputBackButtonTapped.value = ()
-        navigationController?.popViewController(animated: true)
-    }
+//    @objc
+//    private func backButtonTapped() {
+//        // bfViewModel.inputBackButtonTapped.value = ()
+//        navigationController?.popViewController(animated: true)
+//    }
 }
 
 // MARK: - Extension
@@ -217,8 +222,7 @@ extension ShoppingViewController {
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
         
         let chevron = UIImage(systemName: "chevron.left")
-        // let backButton = UIBarButtonItem(image: chevron)
-         let backButton = (UIBarButtonItem(image: chevron, style: .plain, target: self, action: #selector(backButtonTapped)))
+        let backButton = UIBarButtonItem(image: chevron)
         navigationItem.leftBarButtonItem = backButton
         navigationController?.navigationBar.tintColor = .white
     }

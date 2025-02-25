@@ -23,8 +23,8 @@ final class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        bind()
         configureEssential()
+        bind()
     }
     
     // MARK: - Functions

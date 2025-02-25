@@ -20,7 +20,6 @@ final class ShoppingViewModel {
         let dateButtonTapped: ControlEvent<Void>
         let highPriceButtonTapped: ControlEvent<Void>
         let lowPriceButtonTapped: ControlEvent<Void>
-        // TODO: BackButton 로직 작성
         let backButtonTapped: ControlEvent<Void>?
     }
     
@@ -30,6 +29,7 @@ final class ShoppingViewModel {
         let searchList: Driver<[Item]>
         let totalCountText: Driver<String>
         let isItemEmpty: Driver<Bool>
+        let backButtonTapped: ControlEvent<Void>?
         // 버튼 isSelected관련한 output
         let accuracyIsSelected: Driver<Bool>
         let dateIsSelected: Driver<Bool>
@@ -169,6 +169,7 @@ final class ShoppingViewModel {
             searchList: searchList.asDriver(onErrorJustReturn: []),
             totalCountText: totalCountText.asDriver(onErrorJustReturn: ""),
             isItemEmpty: isItemEmpty.asDriver(onErrorJustReturn: false),
+            backButtonTapped: input.backButtonTapped,
             accuracyIsSelected: accuracyIsSelected.asDriver(onErrorJustReturn: false),
             dateIsSelected: dateIsSelected.asDriver(onErrorJustReturn: false),
             highPriceIsSelected: highPriceIsSelected.asDriver(onErrorJustReturn: false),
