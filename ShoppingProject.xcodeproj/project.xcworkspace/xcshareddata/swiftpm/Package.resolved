@@ -1,5 +1,5 @@
 {
-  "originHash" : "c829cbdae1d5d42a94e9eaab382b25d3326fc8fc3ab944ff0615ee10f5857c4d",
+  "originHash" : "d10338d2fd581b8b16402eb2643ad447f5caeb9e57dfc8437f148f9aa3b3ece4",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -15,8 +15,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/onevcat/Kingfisher.git",
       "state" : {
-        "revision" : "e6749919f9761d573d37a7d7e78b1b854c191d7f",
-        "version" : "8.1.3"
+        "revision" : "3db26ab625d194c38e68c1a40e43d1bc12743fe0",
+        "version" : "8.2.0"
+      }
+    },
+    {
+      "identity" : "rxswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ReactiveX/RxSwift.git",
+      "state" : {
+        "revision" : "5dd1907d64f0d36f158f61a466bab75067224893",
+        "version" : "6.9.0"
       }
     },
     {
