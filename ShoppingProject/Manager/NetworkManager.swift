@@ -26,22 +26,43 @@ final class NetworkManager {
             ]
             
             guard let url = URL(string: urlString) else {
-                value(.failure(APIError.unknownResponse))
+                value(.failure(APIError.invalidURL))
                 return Disposables.create {
                     print("🗑️ Disposed")
                 }
             }
             
             AF.request(url, method: .get, headers: header)
-                .validate(statusCode: 200..<300)
+                .validate(statusCode: 200..<299)
                 .responseDecodable(of: SearchItem.self) { response in
                 switch response.result {
                 case .success(let data):
                     print("✅ SUCCESS", url)
+                    print("🙋‍♀️ STATUS CODE \(response.response?.statusCode ?? 000)")
                     value(.success(data))
                 case .failure(let error):
                     print("❌ FAILURE \(error)")
-                    value(.failure(error))
+                    print("🙋‍♀️ STATUS CODE \(response.response?.statusCode ?? 000)")
+                    
+                    let errorStatusCode = response.response?.statusCode
+                    switch errorStatusCode {
+                    case 400:
+                        value(.failure(APIError.invalidParameter))
+                    case 401:
+                        value(.failure(APIError.invalidAuthentication))
+                    case 403:
+                        value(.failure(APIError.callDenied))
+                    case 404:
+                        value(.failure(APIError.invalidURL))
+                    case 405:
+                        value(.failure(APIError.invalidMethod))
+                    case 429:
+                        value(.failure(APIError.callLimitExceeded))
+                    case 500:
+                        value(.failure(APIError.serverError))
+                    default:
+                        value(.failure(APIError.unknownError))
+                    }
                 }
             }
             

@@ -29,7 +29,8 @@ final class ShoppingViewModel {
         let searchList: Driver<[Item]>
         let totalCountText: Driver<String>
         let isItemEmpty: Driver<Bool>
-        let backButtonTapped: ControlEvent<Void>?
+        let backButtonTapped: Driver<Void>?
+        let errorAlert: Driver<ErrorAlert>
         // 버튼 isSelected관련한 output
         let accuracyIsSelected: Driver<Bool>
         let dateIsSelected: Driver<Bool>
@@ -41,6 +42,7 @@ final class ShoppingViewModel {
         
         let totalCountText = PublishRelay<String>()
         let isItemEmpty = PublishRelay<Bool>()
+        let errorAlert = PublishRelay<ErrorAlert>()
         
         let accuracyIsSelected = PublishRelay<Bool>()
         let dateIsSelected = PublishRelay<Bool>()
@@ -51,7 +53,29 @@ final class ShoppingViewModel {
         queryText
             .flatMap {
                 NetworkManager.shared.callSearchAPI(query: $0)
+                    .retry(3)
                     .catch { error in
+                        switch error as? APIError {
+                        case .invalidParameter:
+                            errorAlert.accept(APIError.invalidParameter.errorAlert)
+                        case .invalidAuthentication:
+                            errorAlert.accept(APIError.invalidAuthentication.errorAlert)
+                        case .callDenied:
+                            errorAlert.accept(APIError.callDenied.errorAlert)
+                        case .invalidURL:
+                            errorAlert.accept(APIError.invalidURL.errorAlert)
+                        case .invalidMethod:
+                            errorAlert.accept(APIError.invalidMethod.errorAlert)
+                        case .callLimitExceeded:
+                            errorAlert.accept(APIError.callLimitExceeded.errorAlert)
+                        case .serverError:
+                            errorAlert.accept(APIError.serverError.errorAlert)
+                        case .unknownError:
+                            errorAlert.accept(APIError.unknownError.errorAlert)
+                        default:
+                            errorAlert.accept(APIError.unknownError.errorAlert)
+                        }
+                        
                         let data = SearchItem(totalCount: 0, items: [])
                         return Single.just(data)
                     }
@@ -73,7 +97,29 @@ final class ShoppingViewModel {
             // .distinctUntilChanged() -> 같은 검색어로 필터를 왔다갔다 하는 경우때문에 주석처리
             .flatMap {
                 NetworkManager.shared.callSearchAPI(query: $0, sort: .sim)
+                    .retry(3)
                     .catch { error in
+                        switch error as? APIError {
+                        case .invalidParameter:
+                            errorAlert.accept(APIError.invalidParameter.errorAlert)
+                        case .invalidAuthentication:
+                            errorAlert.accept(APIError.invalidAuthentication.errorAlert)
+                        case .callDenied:
+                            errorAlert.accept(APIError.callDenied.errorAlert)
+                        case .invalidURL:
+                            errorAlert.accept(APIError.invalidURL.errorAlert)
+                        case .invalidMethod:
+                            errorAlert.accept(APIError.invalidMethod.errorAlert)
+                        case .callLimitExceeded:
+                            errorAlert.accept(APIError.callLimitExceeded.errorAlert)
+                        case .serverError:
+                            errorAlert.accept(APIError.serverError.errorAlert)
+                        case .unknownError:
+                            errorAlert.accept(APIError.unknownError.errorAlert)
+                        default:
+                            errorAlert.accept(APIError.unknownError.errorAlert)
+                        }
+                        
                         let data = SearchItem(totalCount: 0, items: [])
                         return Single.just(data)
                     }
@@ -97,7 +143,29 @@ final class ShoppingViewModel {
             .withLatestFrom(queryText)
             .flatMap {
                 NetworkManager.shared.callSearchAPI(query: $0, sort: .date)
+                    .retry(3)
                     .catch { error in
+                        switch error as? APIError {
+                        case .invalidParameter:
+                            errorAlert.accept(APIError.invalidParameter.errorAlert)
+                        case .invalidAuthentication:
+                            errorAlert.accept(APIError.invalidAuthentication.errorAlert)
+                        case .callDenied:
+                            errorAlert.accept(APIError.callDenied.errorAlert)
+                        case .invalidURL:
+                            errorAlert.accept(APIError.invalidURL.errorAlert)
+                        case .invalidMethod:
+                            errorAlert.accept(APIError.invalidMethod.errorAlert)
+                        case .callLimitExceeded:
+                            errorAlert.accept(APIError.callLimitExceeded.errorAlert)
+                        case .serverError:
+                            errorAlert.accept(APIError.serverError.errorAlert)
+                        case .unknownError:
+                            errorAlert.accept(APIError.unknownError.errorAlert)
+                        default:
+                            errorAlert.accept(APIError.unknownError.errorAlert)
+                        }
+                        
                         let data = SearchItem(totalCount: 0, items: [])
                         return Single.just(data)
                     }
@@ -121,7 +189,29 @@ final class ShoppingViewModel {
             .withLatestFrom(queryText)
             .flatMap {
                 NetworkManager.shared.callSearchAPI(query: $0, sort: .dsc)
+                    .retry(3)
                     .catch { error in
+                        switch error as? APIError {
+                        case .invalidParameter:
+                            errorAlert.accept(APIError.invalidParameter.errorAlert)
+                        case .invalidAuthentication:
+                            errorAlert.accept(APIError.invalidAuthentication.errorAlert)
+                        case .callDenied:
+                            errorAlert.accept(APIError.callDenied.errorAlert)
+                        case .invalidURL:
+                            errorAlert.accept(APIError.invalidURL.errorAlert)
+                        case .invalidMethod:
+                            errorAlert.accept(APIError.invalidMethod.errorAlert)
+                        case .callLimitExceeded:
+                            errorAlert.accept(APIError.callLimitExceeded.errorAlert)
+                        case .serverError:
+                            errorAlert.accept(APIError.serverError.errorAlert)
+                        case .unknownError:
+                            errorAlert.accept(APIError.unknownError.errorAlert)
+                        default:
+                            errorAlert.accept(APIError.unknownError.errorAlert)
+                        }
+                        
                         let data = SearchItem(totalCount: 0, items: [])
                         return Single.just(data)
                     }
@@ -145,7 +235,29 @@ final class ShoppingViewModel {
             .withLatestFrom(queryText)
             .flatMap {
                 NetworkManager.shared.callSearchAPI(query: $0, sort: .asc)
+                    .retry(3)
                     .catch { error in
+                        switch error as? APIError {
+                        case .invalidParameter:
+                            errorAlert.accept(APIError.invalidParameter.errorAlert)
+                        case .invalidAuthentication:
+                            errorAlert.accept(APIError.invalidAuthentication.errorAlert)
+                        case .callDenied:
+                            errorAlert.accept(APIError.callDenied.errorAlert)
+                        case .invalidURL:
+                            errorAlert.accept(APIError.invalidURL.errorAlert)
+                        case .invalidMethod:
+                            errorAlert.accept(APIError.invalidMethod.errorAlert)
+                        case .callLimitExceeded:
+                            errorAlert.accept(APIError.callLimitExceeded.errorAlert)
+                        case .serverError:
+                            errorAlert.accept(APIError.serverError.errorAlert)
+                        case .unknownError:
+                            errorAlert.accept(APIError.unknownError.errorAlert)
+                        default:
+                            errorAlert.accept(APIError.unknownError.errorAlert)
+                        }
+                        
                         let data = SearchItem(totalCount: 0, items: [])
                         return Single.just(data)
                     }
@@ -169,7 +281,8 @@ final class ShoppingViewModel {
             searchList: searchList.asDriver(onErrorJustReturn: []),
             totalCountText: totalCountText.asDriver(onErrorJustReturn: ""),
             isItemEmpty: isItemEmpty.asDriver(onErrorJustReturn: false),
-            backButtonTapped: input.backButtonTapped,
+            backButtonTapped: input.backButtonTapped?.asDriver(),
+            errorAlert: errorAlert.asDriver(onErrorJustReturn: ErrorAlert(title: "", message: "")),
             accuracyIsSelected: accuracyIsSelected.asDriver(onErrorJustReturn: false),
             dateIsSelected: dateIsSelected.asDriver(onErrorJustReturn: false),
             highPriceIsSelected: highPriceIsSelected.asDriver(onErrorJustReturn: false),

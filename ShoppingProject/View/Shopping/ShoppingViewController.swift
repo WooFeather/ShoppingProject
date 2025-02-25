@@ -70,7 +70,9 @@ final class ShoppingViewController: UIViewController {
                 if !isEmpty {
                     owner.shoppingView.shoppingCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
                 } else {
-                    return
+                    owner.showAlert(title: "검색 결과가 없어요😭", message: "검색 결과가 없습니다. 검색어를 다시 확인해주세요.", button: "확인") {
+                        owner.navigationController?.popViewController(animated: true)
+                    }
                 }
             }
             .disposed(by: disposeBag)
@@ -85,8 +87,16 @@ final class ShoppingViewController: UIViewController {
             .disposed(by: disposeBag)
         
         output.backButtonTapped!
-            .bind(with: self) { owner, _ in
+            .drive(with: self) { owner, _ in
                 owner.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        output.errorAlert
+            .drive(with: self) { owner, value in
+                owner.showAlert(title: value.title, message: value.message, button: "확인") {
+                    owner.navigationController?.popViewController(animated: true)
+                }
             }
             .disposed(by: disposeBag)
     }
