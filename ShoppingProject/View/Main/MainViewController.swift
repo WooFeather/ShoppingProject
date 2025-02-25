@@ -44,6 +44,7 @@ final class MainViewController: UIViewController {
                     vc.viewModel.queryText.accept(value.1)
                     owner.navigationController?.pushViewController(vc, animated: true)
                 } else {
+                    print(value.1)
                     owner.showAlert(title: "검색어를 다시 확인해주세요😭", message: "검색어는 2글자 이상이어야 합니다.", button: "확인") {
                         owner.dismiss(animated: true)
                     }

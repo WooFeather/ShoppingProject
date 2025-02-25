@@ -33,6 +33,7 @@ final class MainViewModel {
             .map {
                 let trimmingText = $0.trimmingCharacters(in: .whitespaces)
                 if trimmingText.count < 2 {
+                    queryText.accept(trimmingText)
                     return false
                 } else {
                     queryText.accept(trimmingText)
