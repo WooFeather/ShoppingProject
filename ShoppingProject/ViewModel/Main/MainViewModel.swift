@@ -2,39 +2,47 @@
 //  MainViewModel.swift
 //  ShoppingProject
 //
-//  Created by 조우현 on 2/6/25.
+//  Created by 조우현 on 2/25/25.
 //
 
 import Foundation
+import RxSwift
+import RxCocoa
 
-class MainViewModel {
+final class MainViewModel {
+    private let disposeBag = DisposeBag()
     
-    let inputSearchButtonTapped: Observable<String?> = Observable(nil)
-    
-    let outputSearchButtonTapped: Observable<String?> = Observable(nil)
-    let outputValidateAlert: Observable<Bool> = Observable(false)
-    
-    // MARK: - Initializer
-    init() {
-        inputSearchButtonTapped.lazyBind { _ in
-            self.validateSearchText()
-        }
+    struct Input {
+        // 검색버튼 탭
+        let searchButtonTapped: ControlEvent<Void>
+        // 검색 텍스트
+        let searchText: ControlProperty<String>
     }
     
-    // MARK: - Functions
-    private func validateSearchText() {
-        guard let searchText = self.inputSearchButtonTapped.value else {
-            self.outputValidateAlert.value = false
-            return
-        }
+    struct Output {
+        // 유효성 검사 Bool
+        let isTextValidate: Observable<Bool>
+        let queryText: Observable<String>
+    }
+    
+    func transfer(input: Input) -> Output {
+        let queryText = BehaviorSubject(value: "")
         
-        let trimmingText = searchText.trimmingCharacters(in: .whitespaces)
+        let isTextValidate =  input.searchButtonTapped
+            .withLatestFrom(input.searchText)
+            .map {
+                let trimmingText = $0.trimmingCharacters(in: .whitespaces)
+                if trimmingText.count < 2 {
+                    return false
+                } else {
+                    queryText.onNext(trimmingText)
+                    return true
+                }
+            }
         
-        if trimmingText.count < 2 {
-            self.outputValidateAlert.value = true
-        } else {
-            self.outputValidateAlert.value = false
-            self.outputSearchButtonTapped.value = self.inputSearchButtonTapped.value
-        }
+        return Output(
+            isTextValidate: isTextValidate,
+            queryText: queryText
+        )
     }
 }

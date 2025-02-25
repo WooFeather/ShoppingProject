@@ -7,7 +7,7 @@
 
 import Foundation
 
-class Observable<T> {
+class BFObservable<T> {
     
     private var closure: ((T) -> Void)?
     
