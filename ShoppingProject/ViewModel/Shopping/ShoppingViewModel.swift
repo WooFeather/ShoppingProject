@@ -20,11 +20,13 @@ final class ShoppingViewModel {
     
     struct Output {
         // 이전 뷰에서 query 스트링 넘겨받기
-        let queryText: BehaviorRelay<String>
+        let queryText: Driver<String>
     }
     
     func transfer(input: Input) -> Output {
         
-        return Output(queryText: queryText)
+        // 뷰에 들어오면 queryText를 통해 네트워크 통신
+        
+        return Output(queryText: queryText.asDriver())
     }
 }

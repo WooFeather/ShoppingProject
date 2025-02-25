@@ -41,7 +41,7 @@ final class ShoppingViewController: UIViewController {
         let output = viewModel.transfer(input: input)
         
         output.queryText
-            .bind(with: self) { owner, text in
+            .drive(with: self) { owner, text in
                 owner.navigationItem.title = text
             }
             .disposed(by: disposeBag)
