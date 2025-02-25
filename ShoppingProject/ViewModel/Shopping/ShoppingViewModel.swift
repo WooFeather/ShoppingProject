@@ -29,6 +29,7 @@ final class ShoppingViewModel {
         let queryText: Driver<String>
         let searchList: Driver<[Item]>
         let totalCountText: Driver<String>
+        let isItemEmpty: Driver<Bool>
         // 버튼 isSelected관련한 output
         let accuracyIsSelected: Driver<Bool>
         let dateIsSelected: Driver<Bool>
@@ -39,6 +40,8 @@ final class ShoppingViewModel {
     func transfer(input: Input) -> Output {
         
         let totalCountText = PublishRelay<String>()
+        let isItemEmpty = PublishRelay<Bool>()
+        
         let accuracyIsSelected = PublishRelay<Bool>()
         let dateIsSelected = PublishRelay<Bool>()
         let highPriceIsSelected = PublishRelay<Bool>()
@@ -56,6 +59,11 @@ final class ShoppingViewModel {
             .bind(with: self) { owner, value in
                 owner.searchList.accept(value.items)
                 totalCountText.accept("\(value.totalCount.formatted())개의 검색 결과")
+                if value.items.isEmpty {
+                    isItemEmpty.accept(true)
+                } else {
+                    isItemEmpty.accept(false)
+                }
             }
             .disposed(by: disposeBag)
         
@@ -76,6 +84,11 @@ final class ShoppingViewModel {
                 [dateIsSelected, highPriceIsSelected, lowPriceIsSelected].forEach {
                     $0.accept(false)
                 }
+                if value.items.isEmpty {
+                    isItemEmpty.accept(true)
+                } else {
+                    isItemEmpty.accept(false)
+                }
             }
             .disposed(by: disposeBag)
         
@@ -94,6 +107,11 @@ final class ShoppingViewModel {
                 dateIsSelected.accept(true)
                 [accuracyIsSelected, highPriceIsSelected, lowPriceIsSelected].forEach {
                     $0.accept(false)
+                }
+                if value.items.isEmpty {
+                    isItemEmpty.accept(true)
+                } else {
+                    isItemEmpty.accept(false)
                 }
             }
             .disposed(by: disposeBag)
@@ -114,6 +132,11 @@ final class ShoppingViewModel {
                 [accuracyIsSelected, dateIsSelected, lowPriceIsSelected].forEach {
                     $0.accept(false)
                 }
+                if value.items.isEmpty {
+                    isItemEmpty.accept(true)
+                } else {
+                    isItemEmpty.accept(false)
+                }
             }
             .disposed(by: disposeBag)
         
@@ -133,6 +156,11 @@ final class ShoppingViewModel {
                 [accuracyIsSelected, dateIsSelected, highPriceIsSelected].forEach {
                     $0.accept(false)
                 }
+                if value.items.isEmpty {
+                    isItemEmpty.accept(true)
+                } else {
+                    isItemEmpty.accept(false)
+                }
             }
             .disposed(by: disposeBag)
         
@@ -140,6 +168,7 @@ final class ShoppingViewModel {
             queryText: queryText.asDriver(),
             searchList: searchList.asDriver(onErrorJustReturn: []),
             totalCountText: totalCountText.asDriver(onErrorJustReturn: ""),
+            isItemEmpty: isItemEmpty.asDriver(onErrorJustReturn: false),
             accuracyIsSelected: accuracyIsSelected.asDriver(onErrorJustReturn: false),
             dateIsSelected: dateIsSelected.asDriver(onErrorJustReturn: false),
             highPriceIsSelected: highPriceIsSelected.asDriver(onErrorJustReturn: false),

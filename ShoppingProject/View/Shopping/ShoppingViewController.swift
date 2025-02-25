@@ -65,6 +65,17 @@ final class ShoppingViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
+        // 검색결과가 없는 경우가 아니라면 필터링했을 때 뷰를 맨 위로 올리기
+        output.isItemEmpty
+            .drive(with: self) { owner, isEmpty in
+                if !isEmpty {
+                    owner.shoppingView.shoppingCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
+                } else {
+                    return
+                }
+            }
+            .disposed(by: disposeBag)
+        
         Driver.combineLatest(output.accuracyIsSelected, output.dateIsSelected, output.highPriceIsSelected, output.lowPriceIsSelected)
             .drive(with: self) { owner, value in
                 owner.shoppingView.accuracyButton.isSelected = value.0
@@ -89,7 +100,6 @@ final class ShoppingViewController: UIViewController {
 //        bfViewModel.outputCountText.lazyBind { count in
 //            self.shoppingView.resultCountLabel.text = count
 //        }
-    // TODO: 검색결과가 0개가 아닐경우 뷰를 맨 위로 올리기
 //        bfViewModel.outputItemIsEmpty.lazyBind { state in
 //            // 검색결과가 0개일 경우 scrollToItem을 하면 앱이 터질 수 있어서 조건처리
 //            if !state {
