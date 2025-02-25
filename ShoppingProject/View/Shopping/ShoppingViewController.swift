@@ -11,29 +11,24 @@ import RxCocoa
 
 final class ShoppingViewController: UIViewController {
     
-    // TODO: 추후 삭제
-    // let bfViewModel = BFShoppingViewModel()
-    
     private let shoppingView = ShoppingView()
     private let disposeBag = DisposeBag()
     let viewModel = ShoppingViewModel()
     
     // MARK: - LifeCycle
-    override func loadView() {
-        view = shoppingView
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //        bindData()
-        //        configureAction()
         configureView()
         configureData()
         bind()
     }
     
     // MARK: - Functions
+    
+    override func loadView() {
+        view = shoppingView
+    }
     
     private func bind() {
         let input = ShoppingViewModel.Input(
@@ -100,93 +95,6 @@ final class ShoppingViewController: UIViewController {
             }
             .disposed(by: disposeBag)
     }
-    
-//    private func bindData() {
-//        bfViewModel.inputViewDidLoadTrigger.value = ()
-//        
-//        bfViewModel.outputSearchText.bind { text in
-//            self.navigationItem.title = text
-//        }
-//        
-//        bfViewModel.outputSearchItem.lazyBind { _ in
-//            self.shoppingView.shoppingCollectionView.reloadData()
-//        }
-//        
-//        bfViewModel.outputCountText.lazyBind { count in
-//            self.shoppingView.resultCountLabel.text = count
-//        }
-//        bfViewModel.outputItemIsEmpty.lazyBind { state in
-//            // 검색결과가 0개일 경우 scrollToItem을 하면 앱이 터질 수 있어서 조건처리
-//            if !state {
-//                self.shoppingView.shoppingCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: false)
-//            } else {
-//                return
-//            }
-//        }
-//        
-//        bfViewModel.outputBackButtonTapped.lazyBind { _ in
-//            self.navigationController?.popViewController(animated: true)
-//        }
-//    }
-    
-//    private func configureAction() {
-//        shoppingView.accuracyButton.addTarget(self, action: #selector(accuracyButtonTapped), for: .touchUpInside)
-//        shoppingView.dateButton.addTarget(self, action: #selector(dateButtonTapped), for: .touchUpInside)
-//        shoppingView.highPriceButton.addTarget(self, action: #selector(highPriceButtonTapped), for: .touchUpInside)
-//        shoppingView.lowPriceButton.addTarget(self, action: #selector(lowPriceButtonTapped), for: .touchUpInside)
-//    }
-    
-    // MARK: - Actions
-//    @objc
-//    private func accuracyButtonTapped() {
-//        print(#function)
-//        shoppingView.accuracyButton.isSelected = true
-//        [shoppingView.dateButton, shoppingView.highPriceButton, shoppingView.lowPriceButton].forEach {
-//            $0.isSelected = false
-//        }
-//        
-//        bfViewModel.inputAccuracyButtonTapped.value = ()
-//    }
-//    
-//    @objc
-//    private func dateButtonTapped() {
-//        print(#function)
-//        shoppingView.dateButton.isSelected = true
-//        [shoppingView.accuracyButton, shoppingView.highPriceButton, shoppingView.lowPriceButton].forEach {
-//            $0.isSelected = false
-//        }
-//        
-//        bfViewModel.inputDateButtonTapped.value = ()
-//    }
-//    
-//    @objc
-//    private func highPriceButtonTapped() {
-//        print(#function)
-//        shoppingView.highPriceButton.isSelected = true
-//        
-//        [shoppingView.accuracyButton, shoppingView.dateButton, shoppingView.lowPriceButton].forEach {
-//            $0.isSelected = false
-//        }
-//        
-//        bfViewModel.inputHighPriceButtonTapped.value = ()
-//    }
-//    
-//    @objc
-//    private func lowPriceButtonTapped() {
-//        print(#function)
-//        shoppingView.lowPriceButton.isSelected = true
-//        [shoppingView.accuracyButton, shoppingView.dateButton, shoppingView.highPriceButton].forEach {
-//            $0.isSelected = false
-//        }
-//        
-//        bfViewModel.inputLowPriceButtonTapped.value = ()
-//    }
-//    
-//    @objc
-//    private func backButtonTapped() {
-//        // bfViewModel.inputBackButtonTapped.value = ()
-//        navigationController?.popViewController(animated: true)
-//    }
 }
 
 // MARK: - Extension
@@ -209,21 +117,6 @@ final class ShoppingViewController: UIViewController {
 //    }
 //}
 
-//extension ShoppingViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return bfViewModel.outputSearchItem.value.count
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        guard let cell = shoppingView.shoppingCollectionView.dequeueReusableCell(withReuseIdentifier: ShoppingCollectionViewCell.id, for: indexPath) as? ShoppingCollectionViewCell else { return UICollectionViewCell() }
-//        
-//        let data = bfViewModel.outputSearchItem.value[indexPath.row]
-//        cell.configureData(data: data)
-//        
-//        return cell
-//    }
-//}
-
 // MARK: - ConfigureView
 extension ShoppingViewController {
     private func configureView() {
@@ -239,9 +132,6 @@ extension ShoppingViewController {
     
     private func configureData() {
         shoppingView.accuracyButton.isSelected = true
-//        shoppingView.shoppingCollectionView.delegate = self
-//        shoppingView.shoppingCollectionView.dataSource = self
-        // shoppingView.shoppingCollectionView.prefetchDataSource = self
         shoppingView.shoppingCollectionView.register(ShoppingCollectionViewCell.self, forCellWithReuseIdentifier: ShoppingCollectionViewCell.id)
     }
 }

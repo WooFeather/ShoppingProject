@@ -16,18 +16,18 @@ final class MainViewController: UIViewController {
     private let disposeBag = DisposeBag()
     
     // MARK: - LifeCycle
-    override func loadView() {
-        view = mainView
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        configureEssential()
+        configureView()
         bind()
     }
     
     // MARK: - Functions
+    
+    override func loadView() {
+        view = mainView
+    }
     
     private func bind() {
         let input = MainViewModel.Input(
@@ -52,9 +52,10 @@ final class MainViewController: UIViewController {
             .disposed(by: disposeBag)
     }
 }
+
 // MARK: - ConfigureView
 extension MainViewController {
-    private func configureEssential() {
+    private func configureView() {
         navigationItem.title = "도봉러의 쇼핑쇼핑"
         navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
