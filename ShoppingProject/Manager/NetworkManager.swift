@@ -15,7 +15,7 @@ final class NetworkManager {
     
     private init() { }
     
-    func callSearchAPI(query: String, sort: RequestSort) -> Single<SearchItem> {
+    func callSearchAPI(query: String, sort: RequestSort = .sim) -> Single<SearchItem> {
         return Single.create { value in
             
             let urlString = "https://openapi.naver.com/v1/search/shop.json?query=\(query)&display=100&start=1&sort=\(sort)"

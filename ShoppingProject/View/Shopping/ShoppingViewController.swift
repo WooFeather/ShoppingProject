@@ -45,6 +45,19 @@ final class ShoppingViewController: UIViewController {
                 owner.navigationItem.title = text
             }
             .disposed(by: disposeBag)
+        
+        output.totalCountText
+            .drive(with: self) { owner, value in
+                owner.shoppingView.resultCountLabel.text = value
+            }
+            .disposed(by: disposeBag)
+        
+        output.searchList
+            .drive(shoppingView.shoppingCollectionView.rx.items(cellIdentifier: ShoppingCollectionViewCell.id, cellType: ShoppingCollectionViewCell.self)) { (item, element, cell) in
+                
+                cell.configureData(data: element)
+            }
+            .disposed(by: disposeBag)
     }
     
 //    private func bindData() {
