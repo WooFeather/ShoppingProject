@@ -17,12 +17,14 @@ final class MainViewModel {
         let searchButtonTapped: ControlEvent<Void>
         // 검색 텍스트
         let searchText: ControlProperty<String>
+        let wishlistButtonTapped: ControlEvent<Void>?
     }
     
     struct Output {
         // 유효성 검사 Bool
         let isTextValidate: Driver<Bool>
         let queryText: Driver<String>
+        let wishlistButtonTapped: Driver<Void>?
     }
     
     func transfer(input: Input) -> Output {
@@ -43,7 +45,8 @@ final class MainViewModel {
         
         return Output(
             isTextValidate: isTextValidate.asDriver(onErrorJustReturn: false),
-            queryText: queryText.asDriver(onErrorJustReturn: "")
+            queryText: queryText.asDriver(onErrorJustReturn: ""),
+            wishlistButtonTapped: input.wishlistButtonTapped?.asDriver()
         )
     }
 }

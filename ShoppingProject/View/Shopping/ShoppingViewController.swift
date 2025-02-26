@@ -81,7 +81,7 @@ final class ShoppingViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        output.backButtonTapped!
+        output.backButtonTapped?
             .drive(with: self) { owner, _ in
                 owner.navigationController?.popViewController(animated: true)
             }

@@ -32,7 +32,8 @@ final class MainViewController: UIViewController {
     private func bind() {
         let input = MainViewModel.Input(
             searchButtonTapped: mainView.shoppingSearchBar.rx.searchButtonClicked,
-            searchText: mainView.shoppingSearchBar.rx.text.orEmpty
+            searchText: mainView.shoppingSearchBar.rx.text.orEmpty,
+            wishlistButtonTapped: navigationItem.rightBarButtonItem?.rx.tap
         )
         let output = viewModel.transfer(input: input)
         
@@ -51,6 +52,13 @@ final class MainViewController: UIViewController {
                 }
             }
             .disposed(by: disposeBag)
+        
+        output.wishlistButtonTapped?
+            .drive(with: self) { owner, _ in
+                let vc = WishlistViewController()
+                owner.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
     }
 }
 
@@ -60,6 +68,10 @@ extension MainViewController {
         navigationItem.title = "도봉러의 쇼핑쇼핑"
         navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+        
+        let wishlistButton = UIBarButtonItem(image: UIImage(systemName: "heart.square.fill"))
+        navigationItem.rightBarButtonItem = wishlistButton
+        navigationController?.navigationBar.tintColor = .white
     }
 }
 
