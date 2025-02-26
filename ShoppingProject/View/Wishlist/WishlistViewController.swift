@@ -91,12 +91,32 @@ final class WishlistViewController: UIViewController {
     }
 }
 
+extension WishlistViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        wishlistList.remove(at: indexPath.item)
+        
+        updateSnapshot()
+    }
+}
+
+extension WishlistViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let newWishlist = Wishlist(name: searchBar.text ?? "")
+        wishlistList.insert(newWishlist, at: 0)
+        
+        updateSnapshot()
+    }
+}
+
 extension WishlistViewController {
     private func configureView() {
         view.backgroundColor = .black
         navigationItem.title = "나만의 위시리스트"
         navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+        
+        wishlistCollectionView.delegate = self
+        wishlistSearchBar.delegate = self
         
         view.addSubview(wishlistSearchBar)
         view.addSubview(wishlistCollectionView)
