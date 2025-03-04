@@ -69,6 +69,7 @@ final class ShoppingViewController: UIViewController {
                                     let data = LikeItem(imageURL: element.image, mallName: element.mallName, titleName: element.title, price: element.price)
                                     
                                     owner.realm.add(data)
+                                    // TODO: 토스트메세지 띄우기
                                     print("렘 저장 완료")
                                 }
                             } catch {

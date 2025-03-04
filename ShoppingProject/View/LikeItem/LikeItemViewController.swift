@@ -41,6 +41,23 @@ final class LikeItemViewController: UIViewController {
     private func backButtonTapped() {
         navigationController?.popViewController(animated: true)
     }
+    
+    @objc
+    private func likeButtonTapped(_ sender: UIButton) {
+        // TODO: 토스트메세지 띄우기
+        let data = likeItemList[sender.tag]
+        
+        do {
+            try realm.write {
+                realm.delete(data)
+                likeItemView.resultCountLabel.text = "\(likeItemList.count)개의 상품"
+                
+                likeItemView.shoppingCollectionView.reloadData()
+            }
+        } catch {
+            print("렘 데이터 삭제 실패")
+        }
+    }
 }
 
 // MARK: - Extension
@@ -55,8 +72,11 @@ extension LikeItemViewController: UICollectionViewDelegate, UICollectionViewData
         }
         
         let data = likeItemList[indexPath.item]
+        cell.likeButton.tag = indexPath.item
         
         cell.configureRealmData(data: data)
+        cell.likeButton.addTarget(self, action: #selector(likeButtonTapped), for: .touchUpInside)
+        
         return cell
     }
 }
