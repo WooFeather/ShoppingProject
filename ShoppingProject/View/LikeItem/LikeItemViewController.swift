@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 import RealmSwift
 import Toast
 
@@ -13,13 +15,16 @@ final class LikeItemViewController: UIViewController {
 
     private let realm = try! Realm()
     private let likeItemView = LikeItemView()
+    private let viewModel = LikeItemViewModel()
     private var likeItemList: Results<LikeItem>!
+    private let disposeBag = DisposeBag()
     
     // MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
         configureView()
         configureData()
+        // bind()
         fetchRealm()
     }
     
@@ -27,6 +32,55 @@ final class LikeItemViewController: UIViewController {
     override func loadView() {
         view = likeItemView
     }
+    
+    // cell 안에 좋아요 버튼 로직때문에 실패 ㅜ ㅜ
+//    private func bind() {
+//        let input = LikeItemViewModel.Input(
+//            viewWillAppear: rx.viewWillAppear,
+//            searchTextChanged: likeItemView.itemSearchBar.rx.text.orEmpty,
+//            backButtonTapped: navigationItem.leftBarButtonItem?.rx.tap
+//        )
+//        let output = viewModel.transfer(input: input)
+//        
+//        output.likeItemList
+//            .drive(likeItemView.shoppingCollectionView.rx.items(cellIdentifier: ShoppingCollectionViewCell.id, cellType: ShoppingCollectionViewCell.self)) { item, element, cell in
+//                cell.configureRealmData(data: element)
+//                cell.likeButton.rx.tap
+//                    .asDriver()
+//                    .drive(with: self) { owner, _ in
+//                        // 어떻게 배열에 접근하지???????????????????
+//                        let data = ??????
+//                        var style = ToastStyle()
+//                        style.backgroundColor = .white
+//                        style.messageColor = .black
+//                        
+//                        do {
+//                            try owner.realm.write {
+//                                owner.realm.delete(data)
+//                                owner.view.makeToast("좋아요 취소되었습니다.", duration: 1.0, position: .center, style: style)
+//                                
+//                                owner.likeItemView.shoppingCollectionView.reloadData()
+//                            }
+//                        } catch {
+//                            print("렘 데이터 삭제 실패")
+//                        }
+//                    }
+//                    .disposed(by: cell.disposBag)
+//            }
+//            .disposed(by: disposeBag)
+//        
+//        output.likeListCount
+//            .drive(with: self) { owner, count in
+//                owner.likeItemView.resultCountLabel.text = "\(count.formatted())개의 상품"
+//            }
+//            .disposed(by: disposeBag)
+//        
+//        output.backButtonTapped?
+//            .drive(with: self) { owner, _ in
+//                owner.navigationController?.popViewController(animated: true)
+//            }
+//            .disposed(by: disposeBag)
+//    }
     
     private func fetchRealm() {
         print(realm.configuration.fileURL ?? "")
