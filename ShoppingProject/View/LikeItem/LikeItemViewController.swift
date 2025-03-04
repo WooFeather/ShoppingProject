@@ -81,7 +81,25 @@ extension LikeItemViewController: UICollectionViewDelegate, UICollectionViewData
     }
 }
 
-// TODO: 서치바에서 실시간 DB검색기능 구현
+extension LikeItemViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        print(searchText)
+        if searchText.isEmpty {
+            likeItemList = realm.objects(LikeItem.self)
+                .sorted(byKeyPath: "likeDate", ascending: false)
+            
+            likeItemView.resultCountLabel.text = "\(likeItemList.count)개의 상품"
+            likeItemView.shoppingCollectionView.reloadData()
+        } else {
+            likeItemList = realm.objects(LikeItem.self)
+                .sorted(byKeyPath: "likeDate", ascending: false)
+                .where { $0.titleName.contains(searchText, options: .caseInsensitive) }
+            
+            likeItemView.resultCountLabel.text = "\(likeItemList.count)개의 상품"
+            likeItemView.shoppingCollectionView.reloadData()
+        }
+    }
+}
 
 extension LikeItemViewController {
     private func configureView() {
@@ -99,6 +117,7 @@ extension LikeItemViewController {
     private func configureData() {
         likeItemView.shoppingCollectionView.delegate = self
         likeItemView.shoppingCollectionView.dataSource = self
+        likeItemView.itemSearchBar.delegate = self
         likeItemView.accuracyButton.isSelected = true
         likeItemView.shoppingCollectionView.register(ShoppingCollectionViewCell.self, forCellWithReuseIdentifier: ShoppingCollectionViewCell.id)
     }

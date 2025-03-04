@@ -13,13 +13,14 @@ final class LikeItemView: BaseView {
     let resultCountLabel = UILabel()
     lazy var shoppingCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
     
+    // TODO: 필터버튼으로 만들어보기
     let accuracyButton = SortButton(title: "정확도")
     let dateButton = SortButton(title: "날짜순")
     let highPriceButton = SortButton(title: "가격높은순")
     let lowPriceButton = SortButton(title: "가격낮은순")
     private lazy var buttons = [accuracyButton, dateButton, highPriceButton, lowPriceButton]
     
-    private let itemSearchBar = UISearchBar()
+    let itemSearchBar = UISearchBar()
     
     override func configureHierarchy() {
         addSubview(itemSearchBar)
@@ -41,24 +42,24 @@ final class LikeItemView: BaseView {
             make.height.equalTo(17)
         }
         
-        for i in 0..<buttons.count {
-            if i == 0 {
-                buttons[i].snp.makeConstraints { make in
-                    make.top.equalTo(resultCountLabel.snp.bottom).offset(10)
-                    make.leading.equalToSuperview().offset(12)
-                    make.height.equalTo(36)
-                }
-            } else {
-                buttons[i].snp.makeConstraints { make in
-                    make.top.equalTo(resultCountLabel.snp.bottom).offset(10)
-                    make.leading.equalTo(buttons[i - 1].snp.trailing).offset(8)
-                    make.height.equalTo(36)
-                }
-            }
-        }
+//        for i in 0..<buttons.count {
+//            if i == 0 {
+//                buttons[i].snp.makeConstraints { make in
+//                    make.top.equalTo(resultCountLabel.snp.bottom).offset(10)
+//                    make.leading.equalToSuperview().offset(12)
+//                    make.height.equalTo(36)
+//                }
+//            } else {
+//                buttons[i].snp.makeConstraints { make in
+//                    make.top.equalTo(resultCountLabel.snp.bottom).offset(10)
+//                    make.leading.equalTo(buttons[i - 1].snp.trailing).offset(8)
+//                    make.height.equalTo(36)
+//                }
+//            }
+//        }
         
         shoppingCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(accuracyButton.snp.bottom).offset(8)
+            make.top.equalTo(resultCountLabel.snp.bottom).offset(8)
             make.bottom.horizontalEdges.equalToSuperview()
         }
     }
