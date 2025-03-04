@@ -31,6 +31,9 @@ final class LikeItemViewController: UIViewController {
 }
 
 // MARK: - Extension
+// TODO: CollectionView에 좋아요 DB에 있는 데이터 보여주기
+// TODO: 서치바에서 실시간 DB검색기능 구현
+
 extension LikeItemViewController {
     private func configureView() {
         view.backgroundColor = .black

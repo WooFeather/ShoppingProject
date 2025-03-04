@@ -8,9 +8,11 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import RealmSwift
 
 final class ShoppingViewController: UIViewController {
     
+    private let realm = try! Realm()
     private let shoppingView = ShoppingView()
     private let disposeBag = DisposeBag()
     let viewModel = ShoppingViewModel()
@@ -60,6 +62,21 @@ final class ShoppingViewController: UIViewController {
                     .bind(with: self) { owner, _ in
                         cell.likeButton.isSelected.toggle()
                         print(cell.likeButton.isSelected, item)
+                        // realm에 저장
+                        if cell.likeButton.isSelected {
+                            do {
+                                try owner.realm.write {
+                                    let data = LikeItem(imageURL: element.image, mallName: element.mallName, titleName: element.title, price: element.price)
+                                    
+                                    owner.realm.add(data)
+                                    print("렘 저장 완료")
+                                }
+                            } catch {
+                                print("렘 저장 실패")
+                            }
+                        } else {
+                            // TODO: realm에서 삭제
+                        }
                     }
                     .disposed(by: cell.disposBag)
             }
