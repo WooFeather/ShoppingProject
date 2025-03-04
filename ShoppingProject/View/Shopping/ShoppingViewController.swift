@@ -9,6 +9,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 import RealmSwift
+import Toast
 
 final class ShoppingViewController: UIViewController {
     
@@ -64,17 +65,7 @@ final class ShoppingViewController: UIViewController {
                         print(cell.likeButton.isSelected, item)
                         // realm에 저장
                         if cell.likeButton.isSelected {
-                            do {
-                                try owner.realm.write {
-                                    let data = LikeItem(imageURL: element.image, mallName: element.mallName, titleName: element.title, price: element.price)
-                                    
-                                    owner.realm.add(data)
-                                    // TODO: 토스트메세지 띄우기
-                                    print("렘 저장 완료")
-                                }
-                            } catch {
-                                print("렘 저장 실패")
-                            }
+                            owner.saveData(imageURL: element.image, mallName: element.mallName, titleName: element.title, price: element.price)
                         } else {
                             // TODO: realm에서 삭제
                         }
@@ -118,6 +109,23 @@ final class ShoppingViewController: UIViewController {
                 }
             }
             .disposed(by: disposeBag)
+    }
+    
+    private func saveData(imageURL: String, mallName: String, titleName: String, price: String) {
+        do {
+            try realm.write {
+                let data = LikeItem(imageURL: imageURL, mallName: mallName, titleName: titleName, price: price)
+                var style = ToastStyle()
+                style.backgroundColor = .white
+                style.messageColor = .black
+                
+                realm.add(data)
+                view.makeToast("좋아요에 추가되었습니다.", duration: 1.0, position: .center, style: style)
+                print("렘 저장 완료")
+            }
+        } catch {
+            print("렘 저장 실패")
+        }
     }
 }
 

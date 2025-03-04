@@ -7,6 +7,7 @@
 
 import UIKit
 import RealmSwift
+import Toast
 
 final class LikeItemViewController: UIViewController {
 
@@ -44,12 +45,15 @@ final class LikeItemViewController: UIViewController {
     
     @objc
     private func likeButtonTapped(_ sender: UIButton) {
-        // TODO: 토스트메세지 띄우기
         let data = likeItemList[sender.tag]
+        var style = ToastStyle()
+        style.backgroundColor = .white
+        style.messageColor = .black
         
         do {
             try realm.write {
                 realm.delete(data)
+                view.makeToast("좋아요 취소되었습니다.", duration: 1.0, position: .center, style: style)
                 likeItemView.resultCountLabel.text = "\(likeItemList.count)개의 상품"
                 
                 likeItemView.shoppingCollectionView.reloadData()
@@ -85,10 +89,7 @@ extension LikeItemViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print(searchText)
         if searchText.isEmpty {
-            likeItemList = realm.objects(LikeItem.self)
-                .sorted(byKeyPath: "likeDate", ascending: false)
-            
-            likeItemView.resultCountLabel.text = "\(likeItemList.count)개의 상품"
+            fetchRealm()
             likeItemView.shoppingCollectionView.reloadData()
         } else {
             likeItemList = realm.objects(LikeItem.self)
