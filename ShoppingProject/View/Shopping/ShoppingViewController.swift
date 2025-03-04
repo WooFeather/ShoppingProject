@@ -56,6 +56,12 @@ final class ShoppingViewController: UIViewController {
             .drive(shoppingView.shoppingCollectionView.rx.items(cellIdentifier: ShoppingCollectionViewCell.id, cellType: ShoppingCollectionViewCell.self)) { (item, element, cell) in
                 
                 cell.configureData(data: element)
+                cell.likeButton.rx.tap
+                    .bind(with: self) { owner, _ in
+                        cell.likeButton.isSelected.toggle()
+                        print(cell.likeButton.isSelected, item)
+                    }
+                    .disposed(by: cell.disposBag)
             }
             .disposed(by: disposeBag)
         
