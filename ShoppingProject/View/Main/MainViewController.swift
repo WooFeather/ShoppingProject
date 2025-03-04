@@ -33,7 +33,8 @@ final class MainViewController: UIViewController {
         let input = MainViewModel.Input(
             searchButtonTapped: mainView.shoppingSearchBar.rx.searchButtonClicked,
             searchText: mainView.shoppingSearchBar.rx.text.orEmpty,
-            wishlistButtonTapped: navigationItem.rightBarButtonItem?.rx.tap
+            wishlistButtonTapped: navigationItem.rightBarButtonItem?.rx.tap,
+            likeItemButtonTapped: navigationItem.leftBarButtonItem?.rx.tap
         )
         let output = viewModel.transfer(input: input)
         
@@ -59,6 +60,13 @@ final class MainViewController: UIViewController {
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
+        
+        output.likeItemButtonTapped?
+            .drive(with: self) { owner, _ in
+                let vc = LikeItemViewController()
+                owner.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
     }
 }
 
@@ -69,8 +77,12 @@ extension MainViewController {
         navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
         
-        let wishlistButton = UIBarButtonItem(image: UIImage(systemName: "heart.square.fill"))
+        let wishlistButton = UIBarButtonItem(image: UIImage(systemName: "cart"))
         navigationItem.rightBarButtonItem = wishlistButton
+        
+        let likeItemButton = UIBarButtonItem(image: UIImage(systemName: "heart"))
+        navigationItem.leftBarButtonItem = likeItemButton
+        
         navigationController?.navigationBar.tintColor = .white
     }
 }

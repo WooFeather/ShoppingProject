@@ -23,9 +23,8 @@ final class WishlistViewController: UIViewController {
     private let wishlistSearchBar = UISearchBar()
     lazy private var wishlistCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
     
-    private var dataSource: UICollectionViewDiffableDataSource<Section, Wishlist>!
+    private var dataSource: UICollectionViewDiffableDataSource<Section, Wishlist>?
     private var wishlistList: [Wishlist] = [
-        // TODO: 목데이터 삭제
         Wishlist(name: "안경"),
         Wishlist(name: "에어팟"),
         Wishlist(name: "노트북"),
@@ -59,6 +58,7 @@ final class WishlistViewController: UIViewController {
             cell.contentConfiguration = content
             
             var backgroundConfig = UIBackgroundConfiguration.listAccompaniedSidebarCell()
+            backgroundConfig.cornerRadius = 30
             backgroundConfig.strokeColor = .white
             backgroundConfig.strokeWidth = 2
             
@@ -78,7 +78,7 @@ final class WishlistViewController: UIViewController {
         snapshot.appendSections(Section.allCases) // 섹션
         snapshot.appendItems(wishlistList, toSection: .main) // 셀
         
-        dataSource.apply(snapshot)
+        dataSource?.apply(snapshot)
     }
     
     // List Configuration (Layout)
