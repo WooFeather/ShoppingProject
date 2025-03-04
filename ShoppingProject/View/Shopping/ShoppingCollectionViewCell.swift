@@ -102,4 +102,12 @@ class ShoppingCollectionViewCell: BaseCollectionViewCell {
         titleLabel.text = data.title.escapingHTML
         priceLabel.text = NumberFormattingManager.shared.numberFormatting(number: Int(data.price) ?? 0)
     }
+    
+    func configureRealmData(data: LikeItem) {
+        thumbnailImageView.kf.setImage(with: URL(string: data.imageURL))
+        mallNameLabel.text = data.mallName
+        titleLabel.text = data.titleName.escapingHTML
+        priceLabel.text = NumberFormattingManager.shared.numberFormatting(number: Int(data.price) ?? 0)
+        likeButton.isSelected = data.likeStatus
+    }
 }

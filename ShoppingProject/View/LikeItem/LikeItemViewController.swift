@@ -6,21 +6,34 @@
 //
 
 import UIKit
+import RealmSwift
 
 final class LikeItemViewController: UIViewController {
 
+    private let realm = try! Realm()
     private let likeItemView = LikeItemView()
+    private var likeItemList: Results<LikeItem>!
     
     // MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
         configureView()
         configureData()
+        fetchRealm()
     }
     
     // MARK: - Functions
     override func loadView() {
         view = likeItemView
+    }
+    
+    private func fetchRealm() {
+        print(realm.configuration.fileURL ?? "")
+        
+        likeItemList = realm.objects(LikeItem.self)
+            .sorted(byKeyPath: "likeDate", ascending: false)
+        
+        likeItemView.resultCountLabel.text = "\(likeItemList.count)개의 상품"
     }
     
     // MARK: - Action
@@ -31,13 +44,29 @@ final class LikeItemViewController: UIViewController {
 }
 
 // MARK: - Extension
-// TODO: CollectionView에 좋아요 DB에 있는 데이터 보여주기
+extension LikeItemViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return likeItemList.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ShoppingCollectionViewCell.id, for: indexPath) as? ShoppingCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        
+        let data = likeItemList[indexPath.item]
+        
+        cell.configureRealmData(data: data)
+        return cell
+    }
+}
+
 // TODO: 서치바에서 실시간 DB검색기능 구현
 
 extension LikeItemViewController {
     private func configureView() {
         view.backgroundColor = .black
-        navigationItem.title = "좋아요"
+        navigationItem.title = "좋아요한 상품"
         navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
         
@@ -48,6 +77,8 @@ extension LikeItemViewController {
     }
     
     private func configureData() {
+        likeItemView.shoppingCollectionView.delegate = self
+        likeItemView.shoppingCollectionView.dataSource = self
         likeItemView.accuracyButton.isSelected = true
         likeItemView.shoppingCollectionView.register(ShoppingCollectionViewCell.self, forCellWithReuseIdentifier: ShoppingCollectionViewCell.id)
     }

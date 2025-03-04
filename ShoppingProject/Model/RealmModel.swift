@@ -15,6 +15,7 @@ class LikeItem: Object {
     @Persisted(indexed: true) var titleName: String
     @Persisted var price: String
     @Persisted var likeStatus: Bool
+    @Persisted var likeDate: Date
     
     convenience init(imageURL: String, mallName: String, titleName: String, price: String) {
         self.init()
@@ -23,5 +24,6 @@ class LikeItem: Object {
         self.titleName = titleName
         self.price = price
         self.likeStatus = true
+        self.likeDate = Date()
     }
 }
