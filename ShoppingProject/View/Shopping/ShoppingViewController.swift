@@ -13,7 +13,7 @@ import Toast
 
 final class ShoppingViewController: UIViewController {
     
-    private let realm = try! Realm()
+    private let repository: LikeItemRepository = LikeItemTableRepository()
     private let shoppingView = ShoppingView()
     private let disposeBag = DisposeBag()
     let viewModel = ShoppingViewModel()
@@ -112,20 +112,12 @@ final class ShoppingViewController: UIViewController {
     }
     
     private func saveData(imageURL: String, mallName: String, titleName: String, price: String) {
-        do {
-            try realm.write {
-                let data = LikeItem(imageURL: imageURL, mallName: mallName, titleName: titleName, price: price)
-                var style = ToastStyle()
-                style.backgroundColor = .white
-                style.messageColor = .black
-                
-                realm.add(data)
-                view.makeToast("좋아요에 추가되었습니다.", duration: 1.0, position: .center, style: style)
-                print("렘 저장 완료")
-            }
-        } catch {
-            print("렘 저장 실패")
-        }
+        repository.createItem(imageURL: imageURL, mallName: mallName, titleName: titleName, price: price)
+        
+        var style = ToastStyle()
+        style.backgroundColor = .white
+        style.messageColor = .black
+        view.makeToast("좋아요에 추가되었습니다.", duration: 1.0, position: .center, style: style)
     }
 }
 

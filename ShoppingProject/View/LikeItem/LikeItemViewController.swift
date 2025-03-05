@@ -13,7 +13,7 @@ import Toast
 
 final class LikeItemViewController: UIViewController {
 
-    private let realm = try! Realm()
+    private let repository: LikeItemRepository = LikeItemTableRepository()
     private let likeItemView = LikeItemView()
     private let viewModel = LikeItemViewModel()
     private var likeItemList: Results<LikeItem>!
@@ -25,7 +25,8 @@ final class LikeItemViewController: UIViewController {
         configureView()
         configureData()
         // bind()
-        fetchRealm()
+        likeItemList = repository.fetchAll()
+        likeItemView.resultCountLabel.text = "\(likeItemList.count)개의 상품"
     }
     
     // MARK: - Functions
@@ -82,15 +83,6 @@ final class LikeItemViewController: UIViewController {
 //            .disposed(by: disposeBag)
 //    }
     
-    private func fetchRealm() {
-        print(realm.configuration.fileURL ?? "")
-        
-        likeItemList = realm.objects(LikeItem.self)
-            .sorted(byKeyPath: "likeDate", ascending: false)
-        
-        likeItemView.resultCountLabel.text = "\(likeItemList.count)개의 상품"
-    }
-    
     // MARK: - Action
     @objc
     private func backButtonTapped() {
@@ -104,17 +96,12 @@ final class LikeItemViewController: UIViewController {
         style.backgroundColor = .white
         style.messageColor = .black
         
-        do {
-            try realm.write {
-                realm.delete(data)
-                view.makeToast("좋아요 취소되었습니다.", duration: 1.0, position: .center, style: style)
-                likeItemView.resultCountLabel.text = "\(likeItemList.count)개의 상품"
-                
-                likeItemView.shoppingCollectionView.reloadData()
-            }
-        } catch {
-            print("렘 데이터 삭제 실패")
-        }
+        repository.deleteItem(data: data)
+        
+        view.makeToast("좋아요 취소되었습니다.", duration: 1.0, position: .center, style: style)
+        likeItemView.resultCountLabel.text = "\(likeItemList.count)개의 상품"
+        
+        likeItemView.shoppingCollectionView.reloadData()
     }
 }
 
@@ -143,13 +130,10 @@ extension LikeItemViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print(searchText)
         if searchText.isEmpty {
-            fetchRealm()
+            likeItemList = repository.fetchAll()
             likeItemView.shoppingCollectionView.reloadData()
         } else {
-            likeItemList = realm.objects(LikeItem.self)
-                .sorted(byKeyPath: "likeDate", ascending: false)
-                .where { $0.titleName.contains(searchText, options: .caseInsensitive) }
-            
+            likeItemList = repository.fetchFilteredItem(text: searchText)
             likeItemView.resultCountLabel.text = "\(likeItemList.count)개의 상품"
             likeItemView.shoppingCollectionView.reloadData()
         }
