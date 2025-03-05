@@ -9,12 +9,6 @@ import UIKit
 import SnapKit
 import RealmSwift
 
-//struct Wishlist: Hashable, Identifiable {
-//    let id = UUID()
-//    let name: String
-//    let date = Date()
-//}
-
 final class WishlistViewController: UIViewController {
     
     enum Section: CaseIterable {

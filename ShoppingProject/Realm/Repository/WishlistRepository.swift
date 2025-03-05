@@ -54,7 +54,7 @@ final class WishlistTableRepository: WishlistRepository {
         }
     }
     
-    // 삭제 처리를 하기 위한 메서드
+    // 삭제 처리를 하기 위한 수정 메서드
     func updateItem(data: Wishlist) {
         do {
             try realm.write {

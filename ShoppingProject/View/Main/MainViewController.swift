@@ -56,7 +56,7 @@ final class MainViewController: UIViewController {
         
         output.wishlistButtonTapped?
             .drive(with: self) { owner, _ in
-                let vc = WishlistViewController()
+                let vc = WishFolderViewController()
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
