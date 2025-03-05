@@ -13,6 +13,7 @@ final class ShoppingViewModel {
     private let disposeBag = DisposeBag()
     
     var saveData: ((Item) -> Void)?
+    var deleteData: ((Int) -> Void)?
     var queryText = BehaviorRelay(value: "초기값")
     private let searchList = PublishRelay<[Item]>()
     private let repository: LikeItemRepository = LikeItemTableRepository()
@@ -280,6 +281,14 @@ final class ShoppingViewModel {
         
         saveData = { [weak self] element in
             self?.repository.createItem(imageURL: element.image, mallName: element.mallName, titleName: element.title, price: element.price)
+        }
+        
+        // TODO: 삭제기능 인덱스 문제 수정해야될듯 => DB에서는 삭제 확인했는데, 좋아요페이지에는 있음
+        deleteData = { [weak self] index in
+            let data = self?.repository.fetchAll()
+            let deleteData = data?[index]
+            
+            self?.repository.deleteItem(data: deleteData ?? LikeItem(imageURL: "", mallName: "", titleName: "", price: ""))
         }
         
         return Output(

@@ -70,7 +70,7 @@ final class ShoppingViewController: UIViewController {
                             owner.viewModel.saveData?(element)
                             owner.view.makeToast("좋아요에 추가되었습니다.", duration: 1.0, position: .center, style: style)
                         } else {
-                            // TODO: realm에서 삭제
+                            owner.viewModel.deleteData?(item)
                             owner.view.makeToast("좋아요 취소되었습니다.", duration: 1.0, position: .center, style: style)
                         }
                     }
