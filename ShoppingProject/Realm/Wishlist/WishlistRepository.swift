@@ -11,8 +11,8 @@ import RealmSwift
 protocol WishlistRepository {
     func getFileURL()
     func fetchAll() -> Results<Wishlist>
-    // TODO: 폴더 안에 create하는 메서드로 변경
-    func createItem(name: String)
+    func fetchInFolder(folder: WishFolder) -> Results<Wishlist>
+    func createItem(name: String, folder: WishFolder)
     func deleteItem(data: Wishlist)
     func updateItem(data: Wishlist)
 }
@@ -32,13 +32,18 @@ final class WishlistTableRepository: WishlistRepository {
         return data
     }
     
-    func createItem(name: String) {
+    func fetchInFolder(folder: WishFolder) -> Results<Wishlist> {
+        let data = realm.objects(Wishlist.self)
+            .sorted(byKeyPath: "date", ascending: false)
+            .where { $0.isDeleted == false }
+            .where { $0.folder == folder }
+        
+        return data
+    }
+    
+    func createItem(name: String, folder: WishFolder) {
         do {
             try realm.write {
-                let folder = realm.objects(WishFolder.self).where {
-                    $0.name == "개인"
-                }.first!
-                
                 let data = Wishlist(name: name)
                 
                 folder.wishlist.append(data)

@@ -13,6 +13,7 @@ final class Wishlist: Object {
     @Persisted var name: String
     @Persisted var date: Date
     @Persisted var isDeleted: Bool = false
+    @Persisted(originProperty: "wishlist") var folder: LinkingObjects<WishFolder>
     
     convenience init(name: String) {
         self.init()

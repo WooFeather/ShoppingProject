@@ -20,6 +20,7 @@ final class WishlistViewController: UIViewController {
     
     private var dataSource: UICollectionViewDiffableDataSource<Section, Wishlist>?
     private let repository: WishlistRepository = WishlistTableRepository()
+    private let folderRepository: WishFolderRepository = WishFolderTableRepository()
     
     var wishlistList: [Wishlist] = []
     var idContents: ObjectId!
@@ -96,10 +97,13 @@ extension WishlistViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let data = wishlistList[indexPath.item]
         
+        let folder = folderRepository.fetchAll().where {
+            $0.id == idContents
+        }.first!
+        
         repository.updateItem(data: data)
         
-        // TODO: fetchAll을 하는게 아닌데....
-        wishlistList = Array(repository.fetchAll())
+        wishlistList = Array(repository.fetchInFolder(folder: folder))
             
         updateSnapshot()
         
@@ -109,10 +113,14 @@ extension WishlistViewController: UICollectionViewDelegate {
 
 extension WishlistViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        repository.createItem(name: searchBar.text ?? "")
         
-        // TODO: fetchAll을 하는게 아닌데....
-        wishlistList = Array(repository.fetchAll())
+        let folder = folderRepository.fetchAll().where {
+            $0.id == idContents
+        }.first!
+        
+        repository.createItem(name: searchBar.text ?? "", folder: folder)
+        
+        wishlistList = Array(repository.fetchInFolder(folder: folder))
         
         updateSnapshot()
         searchBar.text = ""
@@ -122,7 +130,6 @@ extension WishlistViewController: UISearchBarDelegate {
 extension WishlistViewController {
     private func configureView() {
         view.backgroundColor = .black
-        // TODO: navigationTitle => 폴더명으로 변경
         navigationItem.title = folderNameContents
         navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
