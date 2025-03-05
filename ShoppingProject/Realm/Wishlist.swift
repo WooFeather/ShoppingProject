@@ -12,6 +12,7 @@ final class Wishlist: Object {
     @Persisted(primaryKey: true) var id: ObjectId
     @Persisted var name: String
     @Persisted var date: Date
+    @Persisted var isDeleted: Bool = false
     
     convenience init(name: String) {
         self.init()

@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import RealmSwift
 
 //struct Wishlist: Hashable, Identifiable {
 //    let id = UUID()
@@ -25,12 +26,20 @@ final class WishlistViewController: UIViewController {
     
     private var dataSource: UICollectionViewDiffableDataSource<Section, Wishlist>?
     private var wishlistList: [Wishlist] = []
+    private let repository: WishlistRepository = WishlistTableRepository()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         configureView()
         configureDataSource()
+        updateSnapshot()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        repository.getFileURL()
         updateSnapshot()
     }
     
@@ -69,6 +78,9 @@ final class WishlistViewController: UIViewController {
     
     // DiffableDataSource (Data)
     private func updateSnapshot() {
+        let data = repository.fetchAll()
+        wishlistList = Array(data)
+        
         var snapshot = NSDiffableDataSourceSnapshot<Section, Wishlist>()
         snapshot.appendSections(Section.allCases) // 섹션
         snapshot.appendItems(wishlistList, toSection: .main) // 셀
@@ -88,16 +100,18 @@ final class WishlistViewController: UIViewController {
 
 extension WishlistViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        wishlistList.remove(at: indexPath.item)
+        let data = wishlistList[indexPath.item]
+        repository.updateItem(data: data)
         
         updateSnapshot()
+        
+        repository.deleteItem(data: data)
     }
 }
 
 extension WishlistViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        let newWishlist = Wishlist(name: searchBar.text ?? "")
-        wishlistList.insert(newWishlist, at: 0)
+        repository.createItem(name: searchBar.text ?? "")
         
         updateSnapshot()
         searchBar.text = ""

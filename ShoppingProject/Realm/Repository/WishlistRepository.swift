@@ -14,6 +14,7 @@ protocol WishlistRepository {
     // TODO: 폴더 안에 create하는 메서드로 변경
     func createItem(name: String)
     func deleteItem(data: Wishlist)
+    func updateItem(data: Wishlist)
 }
 
 final class WishlistTableRepository: WishlistRepository {
@@ -23,9 +24,10 @@ final class WishlistTableRepository: WishlistRepository {
         print(realm.configuration.fileURL ?? "URL 찾을 수 없음")
     }
     
-    func fetchAll() -> RealmSwift.Results<Wishlist> {
+    func fetchAll() -> Results<Wishlist> {
         let data = realm.objects(Wishlist.self)
             .sorted(byKeyPath: "date", ascending: false)
+            .where { $0.isDeleted == false }
         
         return data
     }
@@ -49,6 +51,20 @@ final class WishlistTableRepository: WishlistRepository {
             }
         } catch {
             print("realm 데이터 삭제 실패")
+        }
+    }
+    
+    // 삭제 처리를 하기 위한 메서드
+    func updateItem(data: Wishlist) {
+        do {
+            try realm.write {
+                realm.create(Wishlist.self, value: [
+                    "id": data.id,
+                    "isDeleted": true
+                ], update: .modified)
+            }
+        } catch {
+            print("렘 데이터 수정 실패")
         }
     }
 }
