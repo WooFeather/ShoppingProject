@@ -12,8 +12,10 @@ import RxCocoa
 final class ShoppingViewModel {
     private let disposeBag = DisposeBag()
     
+    var saveData: ((Item) -> Void)?
     var queryText = BehaviorRelay(value: "초기값")
     private let searchList = PublishRelay<[Item]>()
+    private let repository: LikeItemRepository = LikeItemTableRepository()
     
     struct Input {
         let accuracyButtonTapped: ControlEvent<Void>
@@ -275,6 +277,10 @@ final class ShoppingViewModel {
                 }
             }
             .disposed(by: disposeBag)
+        
+        saveData = { [weak self] element in
+            self?.repository.createItem(imageURL: element.image, mallName: element.mallName, titleName: element.title, price: element.price)
+        }
         
         return Output(
             queryText: queryText.asDriver(),

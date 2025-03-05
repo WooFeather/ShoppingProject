@@ -12,7 +12,6 @@ import Toast
 
 final class ShoppingViewController: UIViewController {
     
-    private let repository: LikeItemRepository = LikeItemTableRepository()
     private let shoppingView = ShoppingView()
     private let disposeBag = DisposeBag()
     let viewModel = ShoppingViewModel()
@@ -60,13 +59,19 @@ final class ShoppingViewController: UIViewController {
                 cell.configureData(data: element)
                 cell.likeButton.rx.tap
                     .bind(with: self) { owner, _ in
+                        var style = ToastStyle()
+                        style.backgroundColor = .white
+                        style.messageColor = .black
+                        
                         cell.likeButton.isSelected.toggle()
                         print(cell.likeButton.isSelected, item)
                         // realm에 저장
                         if cell.likeButton.isSelected {
-                            owner.saveData(imageURL: element.image, mallName: element.mallName, titleName: element.title, price: element.price)
+                            owner.viewModel.saveData?(element)
+                            owner.view.makeToast("좋아요에 추가되었습니다.", duration: 1.0, position: .center, style: style)
                         } else {
                             // TODO: realm에서 삭제
+                            owner.view.makeToast("좋아요 취소되었습니다.", duration: 1.0, position: .center, style: style)
                         }
                     }
                     .disposed(by: cell.disposBag)
@@ -108,15 +113,6 @@ final class ShoppingViewController: UIViewController {
                 }
             }
             .disposed(by: disposeBag)
-    }
-    
-    private func saveData(imageURL: String, mallName: String, titleName: String, price: String) {
-        repository.createItem(imageURL: imageURL, mallName: mallName, titleName: titleName, price: price)
-        
-        var style = ToastStyle()
-        style.backgroundColor = .white
-        style.messageColor = .black
-        view.makeToast("좋아요에 추가되었습니다.", duration: 1.0, position: .center, style: style)
     }
 }
 
