@@ -8,11 +8,11 @@
 import UIKit
 import SnapKit
 
-struct Wishlist: Hashable, Identifiable {
-    let id = UUID()
-    let name: String
-    let date = Date()
-}
+//struct Wishlist: Hashable, Identifiable {
+//    let id = UUID()
+//    let name: String
+//    let date = Date()
+//}
 
 final class WishlistViewController: UIViewController {
     
@@ -24,12 +24,7 @@ final class WishlistViewController: UIViewController {
     lazy private var wishlistCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
     
     private var dataSource: UICollectionViewDiffableDataSource<Section, Wishlist>?
-    private var wishlistList: [Wishlist] = [
-        Wishlist(name: "안경"),
-        Wishlist(name: "에어팟"),
-        Wishlist(name: "노트북"),
-        Wishlist(name: "테슬라")
-    ]
+    private var wishlistList: [Wishlist] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -105,12 +100,14 @@ extension WishlistViewController: UISearchBarDelegate {
         wishlistList.insert(newWishlist, at: 0)
         
         updateSnapshot()
+        searchBar.text = ""
     }
 }
 
 extension WishlistViewController {
     private func configureView() {
         view.backgroundColor = .black
+        // TODO: navigationTitle => 폴더명으로 변경
         navigationItem.title = "나만의 위시리스트"
         navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]

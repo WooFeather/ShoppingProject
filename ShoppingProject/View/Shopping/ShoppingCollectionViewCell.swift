@@ -25,6 +25,7 @@ class ShoppingCollectionViewCell: BaseCollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
+        likeButton.isSelected = false
         disposBag = DisposeBag()
     }
     

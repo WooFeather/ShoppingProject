@@ -1,5 +1,5 @@
 //
-//  RealmModel.swift
+//  LikeItem.swift
 //  ShoppingProject
 //
 //  Created by 조우현 on 3/4/25.
