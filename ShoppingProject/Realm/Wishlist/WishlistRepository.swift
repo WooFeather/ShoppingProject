@@ -35,9 +35,13 @@ final class WishlistTableRepository: WishlistRepository {
     func createItem(name: String) {
         do {
             try realm.write {
+                let folder = realm.objects(WishFolder.self).where {
+                    $0.name == "개인"
+                }.first!
+                
                 let data = Wishlist(name: name)
                 
-                realm.add(data)
+                folder.wishlist.append(data)
             }
         } catch {
             print("realm 데이터 저장 실패")

@@ -19,8 +19,11 @@ final class WishlistViewController: UIViewController {
     lazy private var wishlistCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
     
     private var dataSource: UICollectionViewDiffableDataSource<Section, Wishlist>?
-    private var wishlistList: [Wishlist] = []
     private let repository: WishlistRepository = WishlistTableRepository()
+    
+    var wishlistList: [Wishlist] = []
+    var idContents: ObjectId!
+    var folderNameContents = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -72,9 +75,6 @@ final class WishlistViewController: UIViewController {
     
     // DiffableDataSource (Data)
     private func updateSnapshot() {
-        let data = repository.fetchAll()
-        wishlistList = Array(data)
-        
         var snapshot = NSDiffableDataSourceSnapshot<Section, Wishlist>()
         snapshot.appendSections(Section.allCases) // 섹션
         snapshot.appendItems(wishlistList, toSection: .main) // 셀
@@ -95,8 +95,12 @@ final class WishlistViewController: UIViewController {
 extension WishlistViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let data = wishlistList[indexPath.item]
+        
         repository.updateItem(data: data)
         
+        // TODO: fetchAll을 하는게 아닌데....
+        wishlistList = Array(repository.fetchAll())
+            
         updateSnapshot()
         
         repository.deleteItem(data: data)
@@ -107,6 +111,9 @@ extension WishlistViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         repository.createItem(name: searchBar.text ?? "")
         
+        // TODO: fetchAll을 하는게 아닌데....
+        wishlistList = Array(repository.fetchAll())
+        
         updateSnapshot()
         searchBar.text = ""
     }
@@ -116,7 +123,7 @@ extension WishlistViewController {
     private func configureView() {
         view.backgroundColor = .black
         // TODO: navigationTitle => 폴더명으로 변경
-        navigationItem.title = "나만의 위시리스트"
+        navigationItem.title = folderNameContents
         navigationController?.navigationBar.barStyle = .default
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
         
