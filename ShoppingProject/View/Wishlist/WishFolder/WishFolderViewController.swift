@@ -75,7 +75,7 @@ extension WishFolderViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let data = folderList[indexPath.row]
         let vc = WishlistViewController()
-        vc.wishlistList = Array(data.wishlist)
+        vc.wishlistList = Array(data.wishlist.sorted(byKeyPath: "date", ascending: false))
         vc.folderNameContents = data.name
         vc.idContents = data.id
         navigationController?.pushViewController(vc, animated: true)
