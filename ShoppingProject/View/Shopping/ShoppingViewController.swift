@@ -8,7 +8,6 @@
 import UIKit
 import RxSwift
 import RxCocoa
-import RealmSwift
 import Toast
 
 final class ShoppingViewController: UIViewController {

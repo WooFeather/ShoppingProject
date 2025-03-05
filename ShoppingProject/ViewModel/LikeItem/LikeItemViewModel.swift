@@ -13,7 +13,8 @@ import RealmSwift
 final class LikeItemViewModel {
     private let disposeBag = DisposeBag()
     private var likeItemList = PublishRelay<Results<LikeItem>>()
-    private let realm = try! Realm()
+    private let repository: LikeItemRepository = LikeItemTableRepository()
+    var likeButtonTapped: ((Int) -> Void)?
     
     struct Input {
         let viewWillAppear: Observable<Bool>
@@ -33,8 +34,8 @@ final class LikeItemViewModel {
         
         input.viewWillAppear
             .bind(with: self) { owner, _ in
-                print(owner.realm.configuration.fileURL ?? "")
-                let data = owner.realm.objects(LikeItem.self).sorted(byKeyPath: "likeDate", ascending: false)
+                owner.repository.getFileURL()
+                let data = owner.repository.fetchAll()
                 owner.likeItemList.accept(data)
                 likeListCount.accept(data.count)
             }
@@ -43,20 +44,31 @@ final class LikeItemViewModel {
         input.searchTextChanged
             .bind(with: self) { owner, text in
                 if text.isEmpty {
-                    let data = owner.realm.objects(LikeItem.self).sorted(byKeyPath: "likeDate", ascending: false)
+                    let data = owner.repository.fetchAll()
                     owner.likeItemList.accept(data)
                     likeListCount.accept(data.count)
                 } else {
-                    let data = owner.realm.objects(LikeItem.self).sorted(byKeyPath: "likeDate", ascending: false)
-                        .where { $0.titleName.contains(text, options: .caseInsensitive) }
+                    let data = owner.repository.fetchFilteredItem(text: text)
                     owner.likeItemList.accept(data)
                     likeListCount.accept(data.count)
                 }
             }
             .disposed(by: disposeBag)
         
+        // 클로저로 삭제기능 구현 성공!!!
+        likeButtonTapped = { [weak self] index in
+            let data = self?.repository.fetchAll()
+            let deleteData = data?[index]
+            
+            self?.repository.deleteItem(data: deleteData ?? LikeItem(imageURL: "", mallName: "", titleName: "", price: ""))
+            
+            self?.likeItemList.accept(data!) // 여기 강제 언래핑이 아쉽긴함...
+            likeListCount.accept(data?.count ?? 0)
+            print(index)
+        }
+        
         return Output(
-            likeItemList: likeItemList.asDriver(onErrorJustReturn: realm.objects(LikeItem.self).sorted(byKeyPath: "likeDate", ascending: false)),
+            likeItemList: likeItemList.asDriver(onErrorJustReturn: repository.fetchAll()),
             likeListCount: likeListCount.asDriver(onErrorJustReturn: 0),
             backButtonTapped: input.backButtonTapped?.asDriver()
         )
